@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 
 import { routes } from './routes';
-// @ts-ignore
 import favicon from './assets/favicon.png';
 import './index.css';
 

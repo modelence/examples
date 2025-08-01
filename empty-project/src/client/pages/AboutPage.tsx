@@ -1,13 +1,22 @@
+import { useEffect } from 'react';
 import logo from '@/client/assets/modelence.svg';
+import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    setTimeout(() => {
+    navigate('/about');
+    }, 2000); // Redirect to /about after 2 seconds
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="text-center">
         <div className="flex justify-center mb-8">
           <img src={logo} alt="Modelence Logo" className="w-32 h-32" />
         </div>
-        <h1 className="text-4xl font-bold text-gray-900">Hello, World!</h1>
+        <h1 className="text-4xl font-bold text-gray-900">About!</h1>
         <p className="mt-4 text-gray-600">Welcome to your new Modelence project</p>
         
         <div className="mt-12 p-4 bg-white rounded-lg shadow-sm">

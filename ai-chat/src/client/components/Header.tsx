@@ -1,8 +1,6 @@
 import { UserMenu } from '@modelence/auth-ui';
 import { Link } from 'react-router-dom';
-
-// @ts-ignore
-import logo from '../assets/icon.svg';
+import logo from '@/client/assets/icon.svg';
 
 export default function Header() {
   return (
