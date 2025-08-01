@@ -1,12 +1,11 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { signupWithPassword } from 'modelence/client';
 
 import { Page } from '@/client/layout/Page';
 import { Card } from '@/client/ui/Card';
 
-// @ts-ignore
-import googleIcon from '../assets/google.svg';
+import googleIcon from '@/client/assets/google.svg';
 
 export default function SignupPage() {
   return (
@@ -17,6 +16,8 @@ export default function SignupPage() {
 }
 
 function SignupForm() {
+  const navigate = useNavigate();
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -28,6 +29,7 @@ function SignupForm() {
       return;
     }
     await signupWithPassword({ email, password });
+    navigate("/");
   };
 
   return (

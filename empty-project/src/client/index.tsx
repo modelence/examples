@@ -1,26 +1,23 @@
+import { Suspense } from 'react';
 import { renderApp } from 'modelence/client';
 import { toast } from 'react-hot-toast';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 
-import { routes } from './routes';
-// @ts-ignore
+import { router } from './router';
 import favicon from './assets/favicon.svg';
 import './index.css';
+import LoadingSpinner from './components/LoadingSpinner';
 
 renderApp({
   routesElement: (
-    <BrowserRouter>
-      <Routes>
-        {routes.map((route) => (
-          <Route key={route.path} path={route.path} element={<route.Component />} />
-        ))}
-      </Routes>
-    </BrowserRouter>
+    <Suspense fallback={<LoadingSpinner fullScreen />}>
+      <RouterProvider router={router} />
+    </Suspense>
   ),
   errorHandler: (error) => {
     toast.error(error.message);
   },
-  loadingElement: <div>Loading...</div>,
+  loadingElement: <LoadingSpinner fullScreen />,
   favicon
 });
 

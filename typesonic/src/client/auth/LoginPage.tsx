@@ -4,8 +4,7 @@ import { loginWithPassword, useSession } from 'modelence/client';
 
 import { Page } from '@/client/layout/Page';
 import { Card } from '@/client/ui/Card';
-// @ts-ignore
-import googleIcon from '../assets/google.svg';
+import googleIcon from '@/client/assets/google.svg';
 
 export default function LoginPage() {
   const navigate = useNavigate();
