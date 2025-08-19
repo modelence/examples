@@ -1,5 +1,6 @@
 import { startApp } from 'modelence/server';
+import { dataApi } from './data-api';
 
 startApp({
-    modules: [/* Add your modules here */]
+    modules: [dataApi]
 });

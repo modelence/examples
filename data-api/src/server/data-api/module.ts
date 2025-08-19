@@ -1,5 +1,27 @@
 import { Module } from 'modelence/server';
 
+// Import all operation handlers
+import { insertOne } from './operations/insertOne';
+import { insertMany } from './operations/insertMany';
+import { findOne } from './operations/findOne';
+import { find } from './operations/find';
+import { updateOne } from './operations/updateOne';
+import { updateMany } from './operations/updateMany';
+import { replaceOne } from './operations/replaceOne';
+import { deleteOne } from './operations/deleteOne';
+import { deleteMany } from './operations/deleteMany';
+import { aggregate } from './operations/aggregate';
+import { listCollections } from './operations/listCollections';
+import { createCollection } from './operations/createCollection';
+import { dropCollection } from './operations/dropCollection';
+import { listDatabases } from './operations/listDatabases';
+import { createIndex } from './operations/createIndex';
+import { dropIndex } from './operations/dropIndex';
+import { listIndexes } from './operations/listIndexes';
+import { runCommand } from './operations/runCommand';
+import { countDocuments } from './operations/countDocuments';
+import { estimatedDocumentCount } from './operations/estimatedDocumentCount';
+
 export default new Module('dataApi', {
   stores: [],
   queries: {},
@@ -9,82 +31,55 @@ export default new Module('dataApi', {
     {
       path: '/data/v1/action/insertOne',
       handlers: {
-        post: async () => {
-          // TODO: Implement insertOne - Insert a single document
-          return { data: null };
-        }
+        post: insertOne
       }
     },
     {
       path: '/data/v1/action/insertMany',
       handlers: {
-        post: async () => {
-          // TODO: Implement insertMany - Insert multiple documents
-          return { data: null };
-        }
+        post: insertMany
       }
     },
     {
       path: '/data/v1/action/findOne',
       handlers: {
-        post: async () => {
-          // TODO: Implement findOne - Find a single document by filter
-          return { data: null };
-        }
+        post: findOne
       }
     },
     {
       path: '/data/v1/action/find',
       handlers: {
-        post: async () => {
-          // TODO: Implement find - Find multiple documents with a filter
-          return { data: null };
-        }
+        post: find
       }
     },
     {
       path: '/data/v1/action/updateOne',
       handlers: {
-        post: async () => {
-          // TODO: Implement updateOne - Update a single document (with filter + update)
-          return { data: null };
-        }
+        post: updateOne
       }
     },
     {
       path: '/data/v1/action/updateMany',
       handlers: {
-        post: async () => {
-          // TODO: Implement updateMany - Update multiple documents
-          return { data: null };
-        }
+        post: updateMany
       }
     },
     {
       path: '/data/v1/action/replaceOne',
       handlers: {
-        post: async () => {
-          // TODO: Implement replaceOne - Replace a single document completely
-          return { data: null };
-        }
+        post: replaceOne
       }
     },
     {
       path: '/data/v1/action/deleteOne',
       handlers: {
-        post: async () => {
-          // TODO: Implement deleteOne - Delete a single document
-          return { data: null };
-        }
+        post: deleteOne
       }
     },
     {
       path: '/data/v1/action/deleteMany',
       handlers: {
-        post: async () => {
-          // TODO: Implement deleteMany - Delete multiple documents
-          return { data: null };
-        }
+        post: deleteMany
       }
     },
     
@@ -92,10 +87,7 @@ export default new Module('dataApi', {
     {
       path: '/data/v1/action/aggregate',
       handlers: {
-        post: async () => {
-          // TODO: Implement aggregate - Run an aggregation pipeline
-          return { data: null };
-        }
+        post: aggregate
       }
     },
     
@@ -103,64 +95,43 @@ export default new Module('dataApi', {
     {
       path: '/data/v1/action/listCollections',
       handlers: {
-        post: async () => {
-          // TODO: Implement listCollections - List all collections in a database
-          return { data: null };
-        }
+        post: listCollections
       }
     },
     {
       path: '/data/v1/action/createCollection',
       handlers: {
-        post: async () => {
-          // TODO: Implement createCollection - Create a new collection
-          return { data: null };
-        }
+        post: createCollection
       }
     },
     {
       path: '/data/v1/action/dropCollection',
       handlers: {
-        post: async () => {
-          // TODO: Implement dropCollection - Drop a collection
-          return { data: null };
-        }
+        post: dropCollection
       }
     },
     {
       path: '/data/v1/action/listDatabases',
       handlers: {
-        post: async () => {
-          // TODO: Implement listDatabases - List databases in the cluster
-          return { data: null };
-        }
+        post: listDatabases
       }
     },
     {
       path: '/data/v1/action/createIndex',
       handlers: {
-        post: async () => {
-          // TODO: Implement createIndex - Create an index on a collection
-          return { data: null };
-        }
+        post: createIndex
       }
     },
     {
       path: '/data/v1/action/dropIndex',
       handlers: {
-        post: async () => {
-          // TODO: Implement dropIndex - Drop an index
-          return { data: null };
-        }
+        post: dropIndex
       }
     },
     {
       path: '/data/v1/action/listIndexes',
       handlers: {
-        post: async () => {
-          // TODO: Implement listIndexes - List all indexes in a collection
-          return { data: null };
-        }
+        post: listIndexes
       }
     },
     
@@ -168,28 +139,19 @@ export default new Module('dataApi', {
     {
       path: '/data/v1/action/runCommand',
       handlers: {
-        post: async () => {
-          // TODO: Implement runCommand - Run arbitrary database commands (within security limits)
-          return { data: null };
-        }
+        post: runCommand
       }
     },
     {
       path: '/data/v1/action/countDocuments',
       handlers: {
-        post: async () => {
-          // TODO: Implement countDocuments - Count documents matching a filter
-          return { data: null };
-        }
+        post: countDocuments
       }
     },
     {
       path: '/data/v1/action/estimatedDocumentCount',
       handlers: {
-        post: async () => {
-          // TODO: Implement estimatedDocumentCount - Estimate the number of docs in a collection
-          return { data: null };
-        }
+        post: estimatedDocumentCount
       }
     }
   ],
