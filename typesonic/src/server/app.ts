@@ -1,4 +1,5 @@
 import { startApp } from 'modelence/server';
+import resend from '@modelence/resend';
 
 import typewriterText from './typewriter-text';
 import typingSession from './typing-session';
@@ -12,6 +13,12 @@ startApp({
     },
     user: {
       permissions: ['typingSession:create', 'typingSession:get:own', 'typingSession:analyze']
+    },
+  },
+  email: {
+    provider: resend,
+    passwordReset: {
+      redirectUrl: '/new-password',
     },
   },
   defaultRoles: {

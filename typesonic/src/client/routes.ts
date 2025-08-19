@@ -14,6 +14,14 @@ export const routes = [
     Component: lazy(() => import('./auth/SignupPage'))
   },
   {
+    path: '/forgot-password',
+    Component: lazy(() => import('./auth/ForgotPasswordPage'))
+  },
+  {
+    path: '/new-password',
+    Component: lazy(() => import('./auth/NewPasswordPage'))
+  },
+  {
     path: '/profile',
     Component: lazy(() => import('./profile/ProfilePage'))
   },
