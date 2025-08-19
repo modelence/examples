@@ -17,7 +17,7 @@ coverage
 .env.test.local
 .env.production.local
 .modelence.env
-.modelence.env.*
+.modelence*.env*
 
 # Logs
 npm-debug.log*
