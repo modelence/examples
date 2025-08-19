@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { ErrorResponse } from '../utils';
 
 interface DropIndexRequest {
   dataSource: string;
@@ -12,7 +14,7 @@ interface DropIndexResponse {
   ok: number;
 }
 
-export async function dropIndex(params: RouteParams): Promise<RouteResponse<DropIndexResponse | { error: string; error_code: string }>> {
+export async function dropIndex(params: RouteParams): Promise<RouteResponse<DropIndexResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection, index } = params.body as DropIndexRequest;
 
@@ -38,15 +40,20 @@ export async function dropIndex(params: RouteParams): Promise<RouteResponse<Drop
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Drop the specified index
-    // TODO: Handle index not found error gracefully
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Count indexes before dropping
+    const indexesBefore = await col.indexes();
+    const nIndexesWas = indexesBefore.length;
+
+    // Drop the specified index
+    await col.dropIndex(index);
+
     return {
       data: {
-        nIndexesWas: 3,
+        nIndexesWas,
         ok: 1
       }
     };

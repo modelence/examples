@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { processFilter, ErrorResponse } from '../utils';
 
 interface FindRequest {
   dataSource: string;
@@ -15,7 +17,8 @@ interface FindResponse {
   documents: Record<string, any>[];
 }
 
-export async function find(params: RouteParams): Promise<RouteResponse<FindResponse | { error: string; error_code: string }>> {
+
+export async function find(params: RouteParams): Promise<RouteResponse<FindResponse | ErrorResponse>> {
   try {
     const { 
       dataSource, 
@@ -60,26 +63,26 @@ export async function find(params: RouteParams): Promise<RouteResponse<FindRespo
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Find documents with the given filter, projection, sort, limit, and skip
-    // TODO: Return the found documents
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Process filter to handle ObjectId conversion
+    const processedFilter = processFilter(filter);
+
+    // Build find options
+    const options: any = {};
+    if (projection) options.projection = projection;
+    if (sort) options.sort = sort;
+    if (limit !== undefined) options.limit = limit;
+    if (skip !== undefined) options.skip = skip;
+
+    // Find documents
+    const documents = await col.find(processedFilter, options).toArray();
+
     return {
       data: {
-        documents: [
-          {
-            _id: "507f1f77bcf86cd799439011",
-            name: "Sample Document 1",
-            createdAt: new Date().toISOString()
-          },
-          {
-            _id: "507f1f77bcf86cd799439012",
-            name: "Sample Document 2",
-            createdAt: new Date().toISOString()
-          }
-        ]
+        documents
       }
     };
   } catch (error) {

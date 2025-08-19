@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { ErrorResponse } from '../utils';
 
 interface RunCommandRequest {
   dataSource: string;
@@ -10,7 +12,7 @@ interface RunCommandResponse {
   result: Record<string, any>;
 }
 
-export async function runCommand(params: RouteParams): Promise<RouteResponse<RunCommandResponse | { error: string; error_code: string }>> {
+export async function runCommand(params: RouteParams): Promise<RouteResponse<RunCommandResponse | ErrorResponse>> {
   try {
     const { dataSource, database, command } = params.body as RunCommandRequest;
 
@@ -50,22 +52,15 @@ export async function runCommand(params: RouteParams): Promise<RouteResponse<Run
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database reference
-    // TODO: Execute the database command
-    // TODO: Return command result
+    // Connect to MongoDB and get database
+    const db = await getDatabase(database);
 
-    // Mock response for now
+    // Execute the database command
+    const result = await db.command(command);
+
     return {
       data: {
-        result: {
-          ok: 1,
-          stats: {
-            executionTimeMillis: 15,
-            totalDocsExamined: 100,
-            totalDocsReturned: 25
-          }
-        }
+        result
       }
     };
   } catch (error) {

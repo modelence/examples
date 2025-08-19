@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { processFilter, processUpdate, ErrorResponse } from '../utils';
 
 interface UpdateManyRequest {
   dataSource: string;
@@ -15,7 +17,7 @@ interface UpdateManyResponse {
   upsertedId?: string;
 }
 
-export async function updateMany(params: RouteParams): Promise<RouteResponse<UpdateManyResponse | { error: string; error_code: string }>> {
+export async function updateMany(params: RouteParams): Promise<RouteResponse<UpdateManyResponse | ErrorResponse>> {
   try {
     const { 
       dataSource, 
@@ -49,18 +51,22 @@ export async function updateMany(params: RouteParams): Promise<RouteResponse<Upd
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Update multiple documents with the given filter and update operators
-    // TODO: Handle upsert option
-    // TODO: Return update result with matchedCount, modifiedCount, and upsertedId if applicable
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Process filter and update to handle ObjectId conversion
+    const processedFilter = processFilter(filter);
+    const processedUpdate = processUpdate(update);
+
+    // Update multiple documents
+    const result = await col.updateMany(processedFilter, processedUpdate, { upsert });
+
     return {
       data: {
-        matchedCount: 3,
-        modifiedCount: 3,
-        ...(upsert && { upsertedId: "507f1f77bcf86cd799439014" })
+        matchedCount: result.matchedCount,
+        modifiedCount: result.modifiedCount,
+        ...(result.upsertedId && { upsertedId: result.upsertedId.toString() })
       }
     };
   } catch (error) {

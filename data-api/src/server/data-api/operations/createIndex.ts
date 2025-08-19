@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { ErrorResponse } from '../utils';
 
 interface CreateIndexRequest {
   dataSource: string;
@@ -21,7 +23,7 @@ interface CreateIndexResponse {
   ok: number;
 }
 
-export async function createIndex(params: RouteParams): Promise<RouteResponse<CreateIndexResponse | { error: string; error_code: string }>> {
+export async function createIndex(params: RouteParams): Promise<RouteResponse<CreateIndexResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection, keys, options = {} } = params.body as CreateIndexRequest;
 
@@ -60,17 +62,26 @@ export async function createIndex(params: RouteParams): Promise<RouteResponse<Cr
       }
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Create the index with specified keys and options
-    // TODO: Return index creation result
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Count indexes before creation
+    const indexesBefore = await col.indexes();
+    const numIndexesBefore = indexesBefore.length;
+
+    // Create the index
+    await col.createIndex(keys, options);
+
+    // Count indexes after creation
+    const indexesAfter = await col.indexes();
+    const numIndexesAfter = indexesAfter.length;
+
     return {
       data: {
         createdCollectionAutomatically: false,
-        numIndexesBefore: 1,
-        numIndexesAfter: 2,
+        numIndexesBefore,
+        numIndexesAfter,
         ok: 1
       }
     };

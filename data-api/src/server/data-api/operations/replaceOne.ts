@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { processFilter, ErrorResponse } from '../utils';
 
 interface ReplaceOneRequest {
   dataSource: string;
@@ -15,7 +17,7 @@ interface ReplaceOneResponse {
   upsertedId?: string;
 }
 
-export async function replaceOne(params: RouteParams): Promise<RouteResponse<ReplaceOneResponse | { error: string; error_code: string }>> {
+export async function replaceOne(params: RouteParams): Promise<RouteResponse<ReplaceOneResponse | ErrorResponse>> {
   try {
     const { 
       dataSource, 
@@ -49,18 +51,21 @@ export async function replaceOne(params: RouteParams): Promise<RouteResponse<Rep
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Replace one document with the given filter and replacement document
-    // TODO: Handle upsert option
-    // TODO: Return replace result with matchedCount, modifiedCount, and upsertedId if applicable
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Process filter to handle ObjectId conversion
+    const processedFilter = processFilter(filter);
+
+    // Replace one document
+    const result = await col.replaceOne(processedFilter, replacement, { upsert });
+
     return {
       data: {
-        matchedCount: 1,
-        modifiedCount: 1,
-        ...(upsert && { upsertedId: "507f1f77bcf86cd799439015" })
+        matchedCount: result.matchedCount,
+        modifiedCount: result.modifiedCount,
+        ...(result.upsertedId && { upsertedId: result.upsertedId.toString() })
       }
     };
   } catch (error) {

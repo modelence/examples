@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { processFilter, ErrorResponse } from '../utils';
 
 interface FindOneRequest {
   dataSource: string;
@@ -12,7 +14,8 @@ interface FindOneResponse {
   document: Record<string, any> | null;
 }
 
-export async function findOne(params: RouteParams): Promise<RouteResponse<FindOneResponse | { error: string; error_code: string }>> {
+
+export async function findOne(params: RouteParams): Promise<RouteResponse<FindOneResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection, filter = {}, projection } = params.body as FindOneRequest;
 
@@ -27,19 +30,20 @@ export async function findOne(params: RouteParams): Promise<RouteResponse<FindOn
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Find the document with the given filter and projection
-    // TODO: Return the found document or null
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Process filter to handle ObjectId conversion
+    const processedFilter = processFilter(filter);
+
+    // Find the document
+    const options = projection ? { projection } : {};
+    const document = await col.findOne(processedFilter, options);
+
     return {
       data: {
-        document: {
-          _id: "507f1f77bcf86cd799439011",
-          name: "Sample Document",
-          createdAt: new Date().toISOString()
-        }
+        document
       }
     };
   } catch (error) {

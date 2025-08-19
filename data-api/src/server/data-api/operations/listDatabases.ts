@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getMongoClient } from '../db';
+import { ErrorResponse } from '../utils';
 
 interface ListDatabasesRequest {
   dataSource: string;
@@ -15,7 +17,7 @@ interface ListDatabasesResponse {
   totalSize?: number;
 }
 
-export async function listDatabases(params: RouteParams): Promise<RouteResponse<ListDatabasesResponse | { error: string; error_code: string }>> {
+export async function listDatabases(params: RouteParams): Promise<RouteResponse<ListDatabasesResponse | ErrorResponse>> {
   try {
     const { dataSource } = params.body as ListDatabasesRequest;
 
@@ -30,19 +32,23 @@ export async function listDatabases(params: RouteParams): Promise<RouteResponse<
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: List all databases in the cluster
-    // TODO: Return database information including size metrics
+    // Connect to MongoDB client
+    const client = await getMongoClient();
 
-    // Mock response for now
+    // List all databases
+    const adminDb = client.db().admin();
+    const databasesResult = await adminDb.listDatabases();
+
+    const databases = databasesResult.databases.map(db => ({
+      name: db.name,
+      sizeOnDisk: db.sizeOnDisk,
+      empty: db.empty
+    }));
+
     return {
       data: {
-        databases: [
-          { name: "myapp", sizeOnDisk: 1048576, empty: false },
-          { name: "analytics", sizeOnDisk: 2097152, empty: false },
-          { name: "logs", sizeOnDisk: 524288, empty: false }
-        ],
-        totalSize: 3670016
+        databases,
+        totalSize: databasesResult.totalSize
       }
     };
   } catch (error) {

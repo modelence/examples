@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { ErrorResponse } from '../utils';
 
 interface ListIndexesRequest {
   dataSource: string;
@@ -19,7 +21,7 @@ interface ListIndexesResponse {
   indexes: IndexInfo[];
 }
 
-export async function listIndexes(params: RouteParams): Promise<RouteResponse<ListIndexesResponse | { error: string; error_code: string }>> {
+export async function listIndexes(params: RouteParams): Promise<RouteResponse<ListIndexesResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection } = params.body as ListIndexesRequest;
 
@@ -34,32 +36,16 @@ export async function listIndexes(params: RouteParams): Promise<RouteResponse<Li
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: List all indexes in the collection
-    // TODO: Return index information
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // List all indexes
+    const indexes = await col.indexes();
+
     return {
       data: {
-        indexes: [
-          {
-            v: 2,
-            key: { _id: 1 },
-            name: "_id_"
-          },
-          {
-            v: 2,
-            key: { email: 1 },
-            name: "email_1",
-            unique: true
-          },
-          {
-            v: 2,
-            key: { createdAt: 1 },
-            name: "createdAt_1"
-          }
-        ]
+        indexes
       }
     };
   } catch (error) {

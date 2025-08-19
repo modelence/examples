@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { ErrorResponse } from '../utils';
 
 interface CreateCollectionRequest {
   dataSource: string;
@@ -10,7 +12,7 @@ interface CreateCollectionResponse {
   ok: number;
 }
 
-export async function createCollection(params: RouteParams): Promise<RouteResponse<CreateCollectionResponse | { error: string; error_code: string }>> {
+export async function createCollection(params: RouteParams): Promise<RouteResponse<CreateCollectionResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection } = params.body as CreateCollectionRequest;
 
@@ -36,12 +38,12 @@ export async function createCollection(params: RouteParams): Promise<RouteRespon
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database reference
-    // TODO: Create the collection
-    // TODO: Handle collection already exists error gracefully
+    // Connect to MongoDB and get database
+    const db = await getDatabase(database);
 
-    // Mock response for now
+    // Create the collection
+    await db.createCollection(collection);
+
     return {
       data: {
         ok: 1

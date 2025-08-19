@@ -1,4 +1,5 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
 
 interface InsertManyRequest {
   dataSource: string;
@@ -11,7 +12,12 @@ interface InsertManyResponse {
   insertedIds: string[];
 }
 
-export async function insertMany(params: RouteParams): Promise<RouteResponse<InsertManyResponse>> {
+interface ErrorResponse {
+  error: string;
+  error_code: string;
+}
+
+export async function insertMany(params: RouteParams): Promise<RouteResponse<InsertManyResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection, documents } = params.body as InsertManyRequest;
 
@@ -36,15 +42,16 @@ export async function insertMany(params: RouteParams): Promise<RouteResponse<Ins
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Insert the documents
-    // TODO: Return the inserted document IDs
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Insert the documents
+    const result = await col.insertMany(documents);
+
     return {
       data: {
-        insertedIds: documents.map((_, index) => `507f1f77bcf86cd79943901${index.toString().padStart(1, '0')}`)
+        insertedIds: Object.values(result.insertedIds).map(id => id.toString())
       }
     };
   } catch (error) {

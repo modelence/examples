@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { processFilter, ErrorResponse } from '../utils';
 
 interface CountDocumentsRequest {
   dataSource: string;
@@ -11,7 +13,7 @@ interface CountDocumentsResponse {
   count: number;
 }
 
-export async function countDocuments(params: RouteParams): Promise<RouteResponse<CountDocumentsResponse | { error: string; error_code: string }>> {
+export async function countDocuments(params: RouteParams): Promise<RouteResponse<CountDocumentsResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection, filter = {} } = params.body as CountDocumentsRequest;
 
@@ -26,15 +28,19 @@ export async function countDocuments(params: RouteParams): Promise<RouteResponse
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Count documents matching the filter
-    // TODO: Return the document count
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Process filter to handle ObjectId conversion
+    const processedFilter = processFilter(filter);
+
+    // Count documents matching the filter
+    const count = await col.countDocuments(processedFilter);
+
     return {
       data: {
-        count: 42
+        count
       }
     };
   } catch (error) {

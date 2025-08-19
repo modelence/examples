@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { ErrorResponse } from '../utils';
 
 interface EstimatedDocumentCountRequest {
   dataSource: string;
@@ -10,7 +12,7 @@ interface EstimatedDocumentCountResponse {
   count: number;
 }
 
-export async function estimatedDocumentCount(params: RouteParams): Promise<RouteResponse<EstimatedDocumentCountResponse | { error: string; error_code: string }>> {
+export async function estimatedDocumentCount(params: RouteParams): Promise<RouteResponse<EstimatedDocumentCountResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection } = params.body as EstimatedDocumentCountRequest;
 
@@ -25,15 +27,16 @@ export async function estimatedDocumentCount(params: RouteParams): Promise<Route
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Get estimated document count (faster than countDocuments but less accurate)
-    // TODO: Return the estimated document count
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Get estimated document count (faster than countDocuments but less accurate)
+    const count = await col.estimatedDocumentCount();
+
     return {
       data: {
-        count: 1247
+        count
       }
     };
   } catch (error) {

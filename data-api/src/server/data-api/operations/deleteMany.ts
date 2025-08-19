@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { processFilter, ErrorResponse } from '../utils';
 
 interface DeleteManyRequest {
   dataSource: string;
@@ -11,7 +13,7 @@ interface DeleteManyResponse {
   deletedCount: number;
 }
 
-export async function deleteMany(params: RouteParams): Promise<RouteResponse<DeleteManyResponse | { error: string; error_code: string }>> {
+export async function deleteMany(params: RouteParams): Promise<RouteResponse<DeleteManyResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection, filter } = params.body as DeleteManyRequest;
 
@@ -26,15 +28,19 @@ export async function deleteMany(params: RouteParams): Promise<RouteResponse<Del
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Delete multiple documents with the given filter
-    // TODO: Return delete result with deletedCount
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Process filter to handle ObjectId conversion
+    const processedFilter = processFilter(filter);
+
+    // Delete multiple documents
+    const result = await col.deleteMany(processedFilter);
+
     return {
       data: {
-        deletedCount: 5
+        deletedCount: result.deletedCount
       }
     };
   } catch (error) {

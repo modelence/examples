@@ -1,4 +1,5 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
 
 interface InsertOneRequest {
   dataSource: string;
@@ -11,7 +12,12 @@ interface InsertOneResponse {
   insertedId: string;
 }
 
-export async function insertOne(params: RouteParams): Promise<RouteResponse<InsertOneResponse>> {
+interface ErrorResponse {
+  error: string;
+  error_code: string;
+}
+
+export async function insertOne(params: RouteParams): Promise<RouteResponse<InsertOneResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection, document } = params.body as InsertOneRequest;
 
@@ -28,15 +34,16 @@ export async function insertOne(params: RouteParams): Promise<RouteResponse<Inse
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Insert the document
-    // TODO: Return the inserted document ID
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Insert the document
+    const result = await col.insertOne(document);
+
     return {
       data: {
-        insertedId: "507f1f77bcf86cd799439011"
+        insertedId: result.insertedId.toString()
       }
     };
   } catch (error) {

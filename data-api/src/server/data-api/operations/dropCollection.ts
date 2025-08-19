@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { ErrorResponse } from '../utils';
 
 interface DropCollectionRequest {
   dataSource: string;
@@ -10,7 +12,7 @@ interface DropCollectionResponse {
   ok: number;
 }
 
-export async function dropCollection(params: RouteParams): Promise<RouteResponse<DropCollectionResponse | { error: string; error_code: string }>> {
+export async function dropCollection(params: RouteParams): Promise<RouteResponse<DropCollectionResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection } = params.body as DropCollectionRequest;
 
@@ -25,15 +27,15 @@ export async function dropCollection(params: RouteParams): Promise<RouteResponse
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database reference
-    // TODO: Drop the collection
-    // TODO: Handle collection not exists error gracefully
+    // Connect to MongoDB and get database
+    const db = await getDatabase(database);
 
-    // Mock response for now
+    // Drop the collection
+    const result = await db.dropCollection(collection);
+
     return {
       data: {
-        ok: 1
+        ok: result ? 1 : 0
       }
     };
   } catch (error) {

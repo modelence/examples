@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { ErrorResponse } from '../utils';
 
 interface AggregateRequest {
   dataSource: string;
@@ -11,7 +13,7 @@ interface AggregateResponse {
   documents: Record<string, any>[];
 }
 
-export async function aggregate(params: RouteParams): Promise<RouteResponse<AggregateResponse | { error: string; error_code: string }>> {
+export async function aggregate(params: RouteParams): Promise<RouteResponse<AggregateResponse | ErrorResponse>> {
   try {
     const { dataSource, database, collection, pipeline } = params.body as AggregateRequest;
 
@@ -37,26 +39,16 @@ export async function aggregate(params: RouteParams): Promise<RouteResponse<Aggr
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database and collection references
-    // TODO: Execute the aggregation pipeline
-    // TODO: Return the aggregation results
+    // Connect to MongoDB and get collection
+    const db = await getDatabase(database);
+    const col = db.collection(collection);
 
-    // Mock response for now
+    // Execute the aggregation pipeline
+    const documents = await col.aggregate(pipeline).toArray();
+
     return {
       data: {
-        documents: [
-          {
-            _id: "group1",
-            count: 10,
-            avgValue: 25.5
-          },
-          {
-            _id: "group2", 
-            count: 7,
-            avgValue: 18.3
-          }
-        ]
+        documents
       }
     };
   } catch (error) {

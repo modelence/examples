@@ -1,4 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { getDatabase } from '../db';
+import { ErrorResponse } from '../utils';
 
 interface ListCollectionsRequest {
   dataSource: string;
@@ -14,7 +16,7 @@ interface ListCollectionsResponse {
   collections: CollectionInfo[];
 }
 
-export async function listCollections(params: RouteParams): Promise<RouteResponse<ListCollectionsResponse | { error: string; error_code: string }>> {
+export async function listCollections(params: RouteParams): Promise<RouteResponse<ListCollectionsResponse | ErrorResponse>> {
   try {
     const { dataSource, database } = params.body as ListCollectionsRequest;
 
@@ -29,19 +31,20 @@ export async function listCollections(params: RouteParams): Promise<RouteRespons
       };
     }
 
-    // TODO: Connect to MongoDB using dataSource configuration
-    // TODO: Get database reference
-    // TODO: List all collections in the database
-    // TODO: Return collection information
+    // Connect to MongoDB and get database
+    const db = await getDatabase(database);
 
-    // Mock response for now
+    // List all collections
+    const collectionInfos = await db.listCollections().toArray();
+
+    const collections = collectionInfos.map(info => ({
+      name: info.name,
+      type: info.type || 'collection'
+    }));
+
     return {
       data: {
-        collections: [
-          { name: "users", type: "collection" },
-          { name: "orders", type: "collection" },
-          { name: "products", type: "collection" }
-        ]
+        collections
       }
     };
   } catch (error) {
