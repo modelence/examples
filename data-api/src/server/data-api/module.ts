@@ -23,6 +23,7 @@ import { countDocuments } from './operations/countDocuments';
 import { estimatedDocumentCount } from './operations/estimatedDocumentCount';
 import { login } from './providers/api-key/login';
 import { dataApiTokens } from './db';
+import { withAuth } from './middleware/withAuth';
 
 export default new Module('dataApi', {
   stores: [
@@ -50,55 +51,55 @@ export default new Module('dataApi', {
     {
       path: '/data/v1/action/insertOne',
       handlers: {
-        post: insertOne
+        post: withAuth(insertOne)
       }
     },
     {
       path: '/data/v1/action/insertMany',
       handlers: {
-        post: insertMany
+        post: withAuth(insertMany)
       }
     },
     {
       path: '/data/v1/action/findOne',
       handlers: {
-        post: findOne
+        post: withAuth(findOne)
       }
     },
     {
       path: '/data/v1/action/find',
       handlers: {
-        post: find
+        post: withAuth(find)
       }
     },
     {
       path: '/data/v1/action/updateOne',
       handlers: {
-        post: updateOne
+        post: withAuth(updateOne)
       }
     },
     {
       path: '/data/v1/action/updateMany',
       handlers: {
-        post: updateMany
+        post: withAuth(updateMany)
       }
     },
     {
       path: '/data/v1/action/replaceOne',
       handlers: {
-        post: replaceOne
+        post: withAuth(replaceOne)
       }
     },
     {
       path: '/data/v1/action/deleteOne',
       handlers: {
-        post: deleteOne
+        post: withAuth(deleteOne)
       }
     },
     {
       path: '/data/v1/action/deleteMany',
       handlers: {
-        post: deleteMany
+        post: withAuth(deleteMany)
       }
     },
     
@@ -106,7 +107,7 @@ export default new Module('dataApi', {
     {
       path: '/data/v1/action/aggregate',
       handlers: {
-        post: aggregate
+        post: withAuth(aggregate)
       }
     },
     
@@ -114,43 +115,43 @@ export default new Module('dataApi', {
     {
       path: '/data/v1/action/listCollections',
       handlers: {
-        post: listCollections
+        post: withAuth(listCollections)
       }
     },
     {
       path: '/data/v1/action/createCollection',
       handlers: {
-        post: createCollection
+        post: withAuth(createCollection)
       }
     },
     {
       path: '/data/v1/action/dropCollection',
       handlers: {
-        post: dropCollection
+        post: withAuth(dropCollection)
       }
     },
     {
       path: '/data/v1/action/listDatabases',
       handlers: {
-        post: listDatabases
+        post: withAuth(listDatabases)
       }
     },
     {
       path: '/data/v1/action/createIndex',
       handlers: {
-        post: createIndex
+        post: withAuth(createIndex)
       }
     },
     {
       path: '/data/v1/action/dropIndex',
       handlers: {
-        post: dropIndex
+        post: withAuth(dropIndex)
       }
     },
     {
       path: '/data/v1/action/listIndexes',
       handlers: {
-        post: listIndexes
+        post: withAuth(listIndexes)
       }
     },
     
@@ -158,19 +159,19 @@ export default new Module('dataApi', {
     {
       path: '/data/v1/action/runCommand',
       handlers: {
-        post: runCommand
+        post: withAuth(runCommand)
       }
     },
     {
       path: '/data/v1/action/countDocuments',
       handlers: {
-        post: countDocuments
+        post: withAuth(countDocuments)
       }
     },
     {
       path: '/data/v1/action/estimatedDocumentCount',
       handlers: {
-        post: estimatedDocumentCount
+        post: withAuth(estimatedDocumentCount)
       }
     }
   ],
