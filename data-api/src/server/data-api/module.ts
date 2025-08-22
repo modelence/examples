@@ -22,6 +22,7 @@ import { runCommand } from './operations/runCommand';
 import { countDocuments } from './operations/countDocuments';
 import { estimatedDocumentCount } from './operations/estimatedDocumentCount';
 import { login } from './providers/api-key/login';
+import { refreshSession } from './auth/session';
 import { dataApiTokens } from './db';
 import { withAuth } from './middleware/withAuth';
 
@@ -44,6 +45,12 @@ export default new Module('dataApi', {
       path: '/auth/providers/api-key/login',
       handlers: {
         post: login
+      }
+    },
+    {
+      path: '/auth/session',
+      handlers: {
+        post: refreshSession
       }
     },
     

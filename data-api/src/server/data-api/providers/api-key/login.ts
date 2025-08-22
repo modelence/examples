@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { getConfig, RouteParams, RouteResponse } from 'modelence/server';
 import { ErrorResponse } from '../../utils';
 import { dataApiTokens } from '../../db';
+import { time } from 'modelence';
 
 interface LoginRequest {
   key: string;
@@ -54,14 +55,14 @@ export async function login(params: RouteParams): Promise<RouteResponse<LoginRes
     }
 
     // Generate secure access and refresh tokens
-    const accessExpiresIn = 1800; // 30 minutes (MongoDB Atlas Data API standard)
-    const refreshExpiresIn = 60 * 24 * 60 * 60; // 60 days in seconds
+    const accessExpiresIn = time.minutes(30);
+    const refreshExpiresIn = time.days(60);
     
     const accessToken = crypto.randomBytes(32).toString('hex');
     const refreshToken = crypto.randomBytes(32).toString('hex');
     
-    const accessExpiresAt = new Date(Date.now() + accessExpiresIn * 1000);
-    const refreshExpiresAt = new Date(Date.now() + refreshExpiresIn * 1000);
+    const accessExpiresAt = new Date(Date.now() + accessExpiresIn * time.seconds(1));
+    const refreshExpiresAt = new Date(Date.now() + refreshExpiresIn * time.seconds(1));
 
     // Store both tokens in the database
     await dataApiTokens.insertMany([
