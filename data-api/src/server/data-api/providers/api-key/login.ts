@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { getConfig, RouteParams, RouteResponse } from 'modelence/server';
-import { ErrorResponse } from '../utils';
+import { ErrorResponse } from '../../utils';
+import { dataApiTokens } from '../../db';
 
 interface LoginRequest {
   key: string;
@@ -8,6 +9,9 @@ interface LoginRequest {
 
 interface LoginResponse {
   access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
 }
 
 export async function login(params: RouteParams): Promise<RouteResponse<LoginResponse | ErrorResponse>> {
@@ -49,10 +53,36 @@ export async function login(params: RouteParams): Promise<RouteResponse<LoginRes
       };
     }
 
-    // Return the access token (in this case, the API key itself)
+    // Generate secure access and refresh tokens
+    const accessExpiresIn = 1800; // 30 minutes (MongoDB Atlas Data API standard)
+    const refreshExpiresIn = 60 * 24 * 60 * 60; // 60 days in seconds
+    
+    const accessToken = crypto.randomBytes(32).toString('hex');
+    const refreshToken = crypto.randomBytes(32).toString('hex');
+    
+    const accessExpiresAt = new Date(Date.now() + accessExpiresIn * 1000);
+    const refreshExpiresAt = new Date(Date.now() + refreshExpiresIn * 1000);
+
+    // Store both tokens in the database
+    await dataApiTokens.insertMany([
+      {
+        token: accessToken,
+        type: 'access',
+        expiresAt: accessExpiresAt,
+      },
+      {
+        token: refreshToken,
+        type: 'refresh',
+        expiresAt: refreshExpiresAt,
+      }
+    ]);
+
     return {
       data: {
-        access_token: key,
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        token_type: 'Bearer',
+        expires_in: accessExpiresIn,
       },
     };
   } catch (error) {

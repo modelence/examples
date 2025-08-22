@@ -1,5 +1,5 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
-import { getMongoClient } from '../db';
+import { getMongoClient } from '../mongoClient';
 import { ErrorResponse } from '../utils';
 
 interface ListDatabasesRequest {

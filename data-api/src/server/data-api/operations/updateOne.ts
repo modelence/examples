@@ -1,5 +1,5 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
-import { getDatabase } from '../db';
+import { getDatabase } from '../mongoClient';
 import { processFilter, processUpdate, ErrorResponse } from '../utils';
 
 interface UpdateOneRequest {

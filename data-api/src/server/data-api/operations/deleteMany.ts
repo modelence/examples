@@ -1,5 +1,5 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
-import { getDatabase } from '../db';
+import { getDatabase } from '../mongoClient';
 import { processFilter, ErrorResponse } from '../utils';
 
 interface DeleteManyRequest {

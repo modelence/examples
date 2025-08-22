@@ -21,10 +21,13 @@ import { listIndexes } from './operations/listIndexes';
 import { runCommand } from './operations/runCommand';
 import { countDocuments } from './operations/countDocuments';
 import { estimatedDocumentCount } from './operations/estimatedDocumentCount';
-import { login } from './operations/login';
+import { login } from './providers/api-key/login';
+import { dataApiTokens } from './db';
 
 export default new Module('dataApi', {
-  stores: [],
+  stores: [
+    dataApiTokens,
+  ],
   queries: {},
   mutations: {},
   configSchema: {
