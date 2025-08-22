@@ -20,7 +20,7 @@ export default function HomePage() {
             Modelence Docs →
           </a>
           <a 
-            href="https://docs.modelence.com" 
+            href="https://www.mongodb.com/docs/atlas/app-services/data-api/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-800 text-lg font-semibold"
