@@ -21,8 +21,6 @@ export async function insertOne(params: RouteParams): Promise<RouteResponse<Inse
   try {
     const { dataSource, database, collection, document } = params.body as InsertOneRequest;
 
-    console.log(params.body);
-
     // Validate required fields
     if (!dataSource || !database || !collection || !document) {
       return {

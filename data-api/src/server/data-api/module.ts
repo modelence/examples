@@ -21,12 +21,28 @@ import { listIndexes } from './operations/listIndexes';
 import { runCommand } from './operations/runCommand';
 import { countDocuments } from './operations/countDocuments';
 import { estimatedDocumentCount } from './operations/estimatedDocumentCount';
+import { login } from './operations/login';
 
 export default new Module('dataApi', {
   stores: [],
   queries: {},
   mutations: {},
+  configSchema: {
+    apiKey: {
+      type: 'string',
+      isPublic: false,
+      default: false,
+    },
+  },
   routes: [
+    // Authentication
+    {
+      path: '/auth/providers/api-key/login',
+      handlers: {
+        post: login
+      }
+    },
+    
     // CRUD Operations
     {
       path: '/data/v1/action/insertOne',
