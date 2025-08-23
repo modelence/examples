@@ -31,7 +31,7 @@ export async function login(params: RouteParams): Promise<RouteResponse<LoginRes
     }
 
     // Get the configured API key from module config
-    const configuredApiKey = getConfig('dataApi.apiKey') as string;
+    const configuredApiKey = getConfig('dataApi.apiKey') as string || process.env.API_KEY;
     
     if (!configuredApiKey) {
       return {
