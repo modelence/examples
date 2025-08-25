@@ -7,9 +7,9 @@ import { cn } from '../utils/cn';
 
 export function Page({ children, className }: { children: React.ReactNode, className?: string }) {
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <div className={cn("w-[1040px] px-5 py-3 mx-auto", className)}>
+      <div className={cn("max-w-[1040px] px-5 py-3 mx-auto flex-1 flex flex-col", className)}>
         {children}
       </div>
       <Toaster position="top-right" />
