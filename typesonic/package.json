@@ -10,8 +10,10 @@
     "build:client": "vite build",
     "build": "npm run build:server && npm run build:client",
     "build:prod": "NODE_ENV=production npm run build",
-    "start": "node .modelence/build/app.js",
+    "start": "node .modelence/build/app.mjs",
     "dev": "modelence dev",
+    "dev:client": "vite",
+    "dev:server": "tsup --watch",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
