@@ -31,7 +31,7 @@ export async function login(params: RouteParams): Promise<RouteResponse<LoginRes
     }
 
     // Get the configured API key from module config
-    const configuredApiKey = getConfig('dataApi.apiKey') as string || process.env.API_KEY;
+    const configuredApiKey = getConfig('dataApi.apiKey') as string || process.env.DATA_API_KEY;
     
     if (!configuredApiKey) {
       return {
@@ -43,8 +43,23 @@ export async function login(params: RouteParams): Promise<RouteResponse<LoginRes
       };
     }
 
-    // Validate the provided key
-    if (!crypto.timingSafeEqual(Buffer.from(key), Buffer.from(configuredApiKey))) {
+    // Ensure both keys are converted to buffers with the same encoding
+    const providedKeyBuffer = Buffer.from(key, 'utf8');
+    const configuredKeyBuffer = Buffer.from(configuredApiKey, 'utf8');
+    
+    // Use timing-safe comparison only if buffers have the same length
+    // If they don't match in length, they're definitely not equal
+    if (providedKeyBuffer.length !== configuredKeyBuffer.length) {
+      return {
+        status: 401,
+        data: {
+          error: "Invalid API key",
+          error_code: "InvalidCredentials"
+        }
+      };
+    }
+    
+    if (!crypto.timingSafeEqual(providedKeyBuffer, configuredKeyBuffer)) {
       return {
         status: 401,
         data: {
