@@ -84,7 +84,11 @@ function TypingResults({ text, session }: { text: string, session: any }) {
     isPending: isAnalyzing
   } = useMutation(modelenceMutation<string>('typingSession.analyze'));
 
-  const participant = session.participants.find((p: any) => p.userId === user?.id);
+  // For guests, there might not be a participant with a user ID
+  // For authenticated users, find their participant record
+  const participant = user?.id 
+    ? session.participants.find((p: any) => p.userId === user.id)
+    : null;
   const speed = participant?.speed ?? null;
 
   const handleAnalyze = async () => {
@@ -110,13 +114,16 @@ function TypingResults({ text, session }: { text: string, session: any }) {
       </div>
       
       <div className="pt-4 border-t">
-        {analysis ? null : <button
-          onClick={handleAnalyze}
-          disabled={isAnalyzing}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isAnalyzing ? 'Analyzing...' : 'Analyze with AI'}
-        </button>}
+        {/* Only show analyze button for authenticated users */}
+        {user?.id && !analysis && (
+          <button
+            onClick={handleAnalyze}
+            disabled={isAnalyzing}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isAnalyzing ? 'Analyzing...' : 'Analyze with AI'}
+          </button>
+        )}
         
         {analysis && (
           <div className="mt-6 p-4 bg-indigo-50 rounded-md">
