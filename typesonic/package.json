@@ -44,6 +44,7 @@
     "@modelence/auth-ui": "^0.1.16",
     "@modelence/react-query": "^1.0.0",
     "@modelence/resend": "^1.0.1",
+    "@modelence/ai": "^0.1.3",
     "@tanstack/react-query": "^5.79.0",
     "ai": "^4.1.16",
     "clsx": "^2.1.1",

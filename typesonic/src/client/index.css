@@ -1,3 +1,82 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Speed line animations for sonic theme */
+.speed-line-1 {
+  position: absolute;
+  top: 20%;
+  left: -100px;
+  width: 200px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #f97316, transparent);
+  animation: speedLine1 3s linear infinite;
+}
+
+.speed-line-2 {
+  position: absolute;
+  top: 40%;
+  left: -150px;
+  width: 150px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  animation: speedLine2 2.5s linear infinite;
+}
+
+.speed-line-3 {
+  position: absolute;
+  top: 60%;
+  left: -120px;
+  width: 180px;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, #f97316, transparent);
+  animation: speedLine3 2.8s linear infinite;
+}
+
+.speed-line-4 {
+  position: absolute;
+  top: 80%;
+  left: -200px;
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  animation: speedLine4 3.2s linear infinite;
+}
+
+@keyframes speedLine1 {
+  0% { left: -200px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: 100vw; opacity: 0; }
+}
+
+@keyframes speedLine2 {
+  0% { left: -150px; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { left: 100vw; opacity: 0; }
+}
+
+@keyframes speedLine3 {
+  0% { left: -180px; opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { left: 100vw; opacity: 0; }
+}
+
+@keyframes speedLine4 {
+  0% { left: -100px; opacity: 0; }
+  25% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { left: 100vw; opacity: 0; }
+}
+
+/* Pulse animation for the logo */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s ease-in-out infinite;
+}
