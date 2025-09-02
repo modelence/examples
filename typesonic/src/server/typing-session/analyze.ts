@@ -1,9 +1,10 @@
-import { generateText } from 'ai';
+import { generateText } from '@modelence/ai';
 import { openai } from '@ai-sdk/openai';
 
 export async function analyzeSession(text: string, speed: number) {
   const { text: analysis } = await generateText({
-    model: openai('gpt-4o'),
+    provider: 'openai',
+    model: 'gpt-4o',
     prompt: `Analyze this typing test result:
   
 Text typed: "${text}"

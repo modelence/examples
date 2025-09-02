@@ -9,7 +9,7 @@ startApp({
   modules: [typewriterText, typingSession],
   roles: {
     guest: {
-      permissions: [],
+      permissions: ['typingSession:create', 'typingSession:get:own'],
     },
     user: {
       permissions: ['typingSession:create', 'typingSession:get:own', 'typingSession:analyze']
