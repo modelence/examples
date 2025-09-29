@@ -1,4 +1,7 @@
+import crypto from 'crypto';
 import { ObjectId } from 'mongodb';
+import { ValidationError, AuthError } from 'modelence';
+import { getConfig } from 'modelence/server';
 
 export interface ErrorResponse {
   error: string;
@@ -40,4 +43,21 @@ export function processUpdate(update: Record<string, any>): Record<string, any> 
   }
   
   return processedUpdate;
+}
+
+export function validateApiKey(providedApiKey: string): void {
+  const configuredApiKey = getConfig('dataApi.apiKey') as string || process.env.DATA_API_KEY;
+
+  if (!configuredApiKey) {
+    throw new ValidationError('API key authentication not configured');
+  }
+
+  // Use timing-safe comparison for API key validation
+  const providedKeyBuffer = Buffer.from(providedApiKey, 'utf8');
+  const configuredKeyBuffer = Buffer.from(configuredApiKey, 'utf8');
+
+  if (providedKeyBuffer.length !== configuredKeyBuffer.length ||
+      !crypto.timingSafeEqual(providedKeyBuffer, configuredKeyBuffer)) {
+    throw new AuthError('Invalid API key');
+  }
 }
