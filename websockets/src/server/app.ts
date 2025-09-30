@@ -1,5 +1,6 @@
 import { startApp } from 'modelence/server';
+import chat from './chat';
 
 startApp({
-    modules: [/* Add your modules here */]
+  modules: [chat],
 });

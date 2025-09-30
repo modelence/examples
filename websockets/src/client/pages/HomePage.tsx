@@ -45,7 +45,7 @@ export default function HomePage() {
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onKeyPress={(e) => e.key === 'Enter' && handleJoinChat()}
+            onKeyUp={(e) => e.key === 'Enter' && handleJoinChat()}
           />
 
           <button
@@ -119,7 +119,7 @@ export default function HomePage() {
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              onKeyUp={(e) => e.key === 'Enter' && handleSendMessage()}
             />
             <button
               onClick={handleSendMessage}
