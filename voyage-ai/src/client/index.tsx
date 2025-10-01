@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { renderApp } from 'modelence/client';
-import { toast } from 'react-hot-toast';
+import { toast, Toaster } from 'react-hot-toast';
 import { RouterProvider } from 'react-router-dom';
 
 import { router } from './router';
@@ -21,8 +21,9 @@ const queryClient = new QueryClient({
 renderApp({
   routesElement: (
     <Suspense fallback={<LoadingSpinner fullScreen />}>
+      <Toaster position="top-right" />
       <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+        <RouterProvider router={router} />
       </QueryClientProvider>
     </Suspense>
   ),
