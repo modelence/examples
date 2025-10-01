@@ -81,4 +81,11 @@ export default new Module('voyage', {
       return { success: true };
     },
   },
+  configSchema: {
+    apiKey: {
+      type: 'string',
+      isPublic: false,
+      default: '',
+    },
+  },
 });
