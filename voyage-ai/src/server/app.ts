@@ -1,5 +1,6 @@
 import { startApp } from 'modelence/server';
+import voyage from './voyage';
 
 startApp({
-    modules: [/* Add your modules here */]
+    modules: [voyage]
 });
