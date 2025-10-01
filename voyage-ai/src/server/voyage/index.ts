@@ -47,19 +47,23 @@ export default new Module('voyage', {
   },
   mutations: {
     async addDocument(args) {
-      const { content, metadata } = z.object({
-        content: z.string().min(1),
-        metadata: z.object({
-          title: z.string().optional(),
-          description: z.string().optional(),
-        }).optional(),
+      const { title, description } = z.object({
+        title: z.string().min(1),
+        description: z.string().min(1),
       }).parse(args);
+
+      // Combine title and description for embedding
+      const content = `${title}\n${description}`;
 
       // Generate embedding for the document
       const embedding = await generateEmbedding(content, 'document');
 
       const result = await dbDocuments.insertOne({
         content,
+        metadata: {
+          title,
+          description,
+        },
         embedding,
         createdAt: new Date(),
       });
@@ -67,7 +71,10 @@ export default new Module('voyage', {
       return {
         id: result.insertedId.toString(),
         content,
-        metadata,
+        metadata: {
+          title,
+          description,
+        },
         createdAt: new Date(),
       };
     },

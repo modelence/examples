@@ -4,9 +4,9 @@ export const dbDocuments = new Store('documents', {
   schema: {
     content: schema.string(),
     metadata: schema.object({
-      title: schema.string().optional(),
-      description: schema.string().optional(),
-    }).optional(),
+      title: schema.string(),
+      description: schema.string(),
+    }),
     embedding: schema.array(schema.number()),
     createdAt: schema.date(),
   },
