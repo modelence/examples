@@ -13,4 +13,21 @@ export const dbDocuments = new Store('documents', {
   indexes: [
     { key: { createdAt: -1 } },
   ],
+  searchIndexes: [
+    {
+      name: 'vector_index',
+      definition: {
+        mappings: {
+          dynamic: false,
+          fields: {
+            embedding: {
+              type: 'knnVector',
+              dimensions: 1024,
+              similarity: 'cosine',
+            },
+          },
+        },
+      },
+    },
+  ],
 });
