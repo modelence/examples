@@ -70,7 +70,7 @@ export default function HomePage() {
             <div className="flex items-center gap-3">
               <img src={logo} alt="Modelence Logo" className="w-10 h-10" />
               <div>
-                <h1 className="text-xl font-semibold text-slate-900">Document Manager</h1>
+                <h1 className="text-xl font-semibold text-slate-900">Support Chatbot Agentic Memory</h1>
                 <p className="text-sm text-slate-500">Powered by Voyage AI</p>
               </div>
             </div>
