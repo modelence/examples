@@ -6,10 +6,8 @@ import { modelenceMutation, modelenceQuery } from '@modelence/react-query';
 interface Document {
   _id: string;
   content: string;
-  metadata?: {
-    title: string;
-    description: string;
-  };
+  title: string;
+  description: string;
   createdAt: Date;
 }
 
@@ -153,10 +151,10 @@ export default function HomePage() {
                     className="p-4 bg-gradient-to-r from-blue-50 to-transparent rounded-lg border border-blue-100
                              hover:border-blue-200 transition-all duration-200"
                   >
-                    {result.metadata ? (
+                    {result.title ? (
                       <>
-                        <h3 className="text-base font-semibold text-slate-900 mb-2">{result.metadata.title}</h3>
-                        <p className="text-sm text-slate-700 leading-relaxed">{result.metadata.description}</p>
+                        <h3 className="text-base font-semibold text-slate-900 mb-2">{result.title}</h3>
+                        <p className="text-sm text-slate-700 leading-relaxed">{result.description}</p>
                       </>
                     ) : (
                       <p className="text-sm text-slate-700 leading-relaxed">{result.content}</p>
@@ -217,9 +215,9 @@ export default function HomePage() {
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex-1 min-w-0">
-                      {doc.metadata ? (
+                      {doc.title ? (
                         <h3 className="text-lg font-semibold text-slate-900 mb-1 truncate">
-                          {doc.metadata.title}
+                          {doc.title}
                         </h3>
                       ) : (
                         <h3 className="text-lg font-semibold text-slate-900 mb-1 truncate">
@@ -254,7 +252,7 @@ export default function HomePage() {
                   </div>
 
                   <p className="text-sm text-slate-600 leading-relaxed line-clamp-3">
-                    {doc.metadata?.description || doc.content}
+                    {doc.description || doc.content}
                   </p>
                 </article>
               ))}
