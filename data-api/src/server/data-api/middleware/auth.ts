@@ -1,17 +1,48 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
 import { dataApiTokens } from '../db';
-import { ErrorResponse } from '../utils';
+import { ErrorResponse, validateApiKey } from '../utils';
+import { AuthError, ValidationError } from 'modelence';
 
 export async function authenticateToken(params: RouteParams): Promise<RouteResponse<ErrorResponse> | null> {
   try {
+    // Check for apiKey header first
+    const apiKeyHeader = params.headers.apikey;
+    if (apiKeyHeader) {
+      try {
+        // API Key authentication
+        validateApiKey(apiKeyHeader);
+        // API key is valid, allow request to proceed
+        return null;
+      } catch (error) {
+        if (error instanceof ValidationError) {
+          return {
+            status: error.status,
+            data: {
+              error: error.message,
+              error_code: "InternalServerError"
+            }
+          };
+        } else if (error instanceof AuthError) {
+          return {
+            status: error.status,
+            data: {
+              error: error.message,
+              error_code: "InvalidCredentials"
+            }
+          };
+        }
+        throw error;
+      }
+    }
+
     // Check for Authorization header with Bearer token
     const authHeader = params.headers.authorization;
-    
+
     if (!authHeader) {
       return {
         status: 401,
         data: {
-          error: "Missing Authorization header",
+          error: "Missing Authorization header or apiKey header",
           error_code: "MissingAuthInfo"
         }
       };
@@ -30,7 +61,7 @@ export async function authenticateToken(params: RouteParams): Promise<RouteRespo
 
     // Extract the token
     const token = authHeader.substring(7); // Remove "Bearer " prefix
-    
+
     if (!token) {
       return {
         status: 401,
