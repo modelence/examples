@@ -1,7 +1,7 @@
 import { Module, ObjectId } from 'modelence/server';
 import { z } from 'zod';
 import { dbDocuments } from './db';
-import { generateEmbedding } from './voyage';
+import { generateEmbedding, rerank } from './voyage';
 
 export default new Module('voyage', {
   stores: [dbDocuments],
@@ -13,36 +13,27 @@ export default new Module('voyage', {
       });
     },
     async searchSimilar(args) {
-      const { query, limit = 5 } = z.object({
+      const { query } = z.object({
         query: z.string(),
-        limit: z.number().optional(),
       }).parse(args);
 
       // Generate embedding for the query
       const queryEmbedding = await generateEmbedding(query, 'query');
 
       // Perform vector search using MongoDB's aggregation pipeline
-      const results = await dbDocuments.aggregate([
-        {
-          $vectorSearch: {
-            queryVector: queryEmbedding,
-            path: 'embedding',
-            numCandidates: 100,
-            limit,
-            index: 'vector_index',
-          },
+      const results = await (await dbDocuments.vectorSearch({
+        field: 'embedding',
+        embedding: queryEmbedding,
+        numCandidates: 100,
+        limit: 10,
+        projection: {
+          content: 1,
+          metadata: 1,
+          createdAt: 1,
         },
-        {
-          $project: {
-            content: 1,
-            metadata: 1,
-            createdAt: 1,
-            score: { $meta: 'vectorSearchScore' },
-          },
-        },
-      ]).toArray();
+      })).toArray();
 
-      return results;
+      return await rerank(results, 'content', query);
     },
   },
   mutations: {

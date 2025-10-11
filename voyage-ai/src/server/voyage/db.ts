@@ -7,27 +7,16 @@ export const dbDocuments = new Store('documents', {
       title: schema.string(),
       description: schema.string(),
     }),
-    embedding: schema.array(schema.number()),
+    embedding: schema.embedding(),
     createdAt: schema.date(),
   },
   indexes: [
     { key: { createdAt: -1 } },
   ],
   searchIndexes: [
-    {
-      name: 'vector_index',
-      definition: {
-        mappings: {
-          dynamic: false,
-          fields: {
-            embedding: {
-              type: 'knnVector',
-              dimensions: 1024,
-              similarity: 'cosine',
-            },
-          },
-        },
-      },
-    },
+    Store.vectorIndex({
+      field: 'embedding',
+      dimensions: 1024,
+    }),
   ],
 });
