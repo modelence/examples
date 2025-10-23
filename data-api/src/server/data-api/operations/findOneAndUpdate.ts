@@ -43,18 +43,6 @@ export async function findOneAndUpdate(params: RouteParams): Promise<RouteRespon
       };
     }
 
-    // Validate update operators
-    const hasValidOperator = Object.keys(update).some(key => key.startsWith('$'));
-    if (!hasValidOperator) {
-      return {
-        status: 400,
-        data: {
-          error: "update must contain at least one update operator (e.g., $set, $inc, $push)",
-          error_code: "InvalidParameter"
-        }
-      };
-    }
-
     // Connect to MongoDB and get collection
     const db = await getDatabase(database);
     const col = db.collection(collection);

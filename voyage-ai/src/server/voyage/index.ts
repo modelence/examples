@@ -47,7 +47,7 @@ export default new Module('voyage', {
       const content = `${title}\n${description}`;
 
       // Generate embedding for the document
-      const embedding = await generateEmbedding(content, 'document');
+      //const embedding = await generateEmbedding(content, 'document');
 
       const result = await dbDocuments.insertOne({
         content,
@@ -55,9 +55,9 @@ export default new Module('voyage', {
           title,
           description,
         },
-        embedding,
+        embedding: [],
         createdAt: new Date(),
-      });
+      } as any);
 
       return {
         id: result.insertedId.toString(),
