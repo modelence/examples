@@ -39,6 +39,18 @@ export async function replaceOne(params: RouteParams): Promise<RouteResponse<Rep
       };
     }
 
+    // Validate replacement document doesn't contain update operators
+    const hasUpdateOperator = Object.keys(replacement).some(key => key.startsWith('$'));
+    if (hasUpdateOperator) {
+      return {
+        status: 400,
+        data: {
+          error: "replacement document cannot contain update operators (keys starting with $)",
+          error_code: "InvalidParameter"
+        }
+      };
+    }
+
     // Connect to MongoDB and get collection
     const db = await getDatabase(database);
     const col = db.collection(collection);
