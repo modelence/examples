@@ -70,7 +70,7 @@ export async function createIndex(params: RouteParams): Promise<RouteResponse<Cr
     const indexesBefore = await col.indexes();
     const numIndexesBefore = indexesBefore.length;
 
-    // Create the index
+    // Create the index with options (including name if provided)
     await col.createIndex(keys, options);
 
     // Count indexes after creation

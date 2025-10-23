@@ -11,6 +11,11 @@ import { replaceOne } from './operations/replaceOne';
 import { deleteOne } from './operations/deleteOne';
 import { deleteMany } from './operations/deleteMany';
 import { aggregate } from './operations/aggregate';
+import { findOneAndDelete } from './operations/findOneAndDelete';
+import { findOneAndReplace } from './operations/findOneAndReplace';
+import { findOneAndUpdate } from './operations/findOneAndUpdate';
+import { bulkWrite } from './operations/bulkWrite';
+import { distinct } from './operations/distinct';
 import { listCollections } from './operations/listCollections';
 import { createCollection } from './operations/createCollection';
 import { dropCollection } from './operations/dropCollection';
@@ -122,7 +127,41 @@ export default new Module('dataApi', {
         post: withAuth(aggregate)
       }
     },
-    
+    {
+      path: '/data/v1/action/distinct',
+      handlers: {
+        post: withAuth(distinct)
+      }
+    },
+
+    // FindAndModify Operations
+    {
+      path: '/data/v1/action/findOneAndDelete',
+      handlers: {
+        post: withAuth(findOneAndDelete)
+      }
+    },
+    {
+      path: '/data/v1/action/findOneAndReplace',
+      handlers: {
+        post: withAuth(findOneAndReplace)
+      }
+    },
+    {
+      path: '/data/v1/action/findOneAndUpdate',
+      handlers: {
+        post: withAuth(findOneAndUpdate)
+      }
+    },
+
+    // Bulk Operations
+    {
+      path: '/data/v1/action/bulkWrite',
+      handlers: {
+        post: withAuth(bulkWrite)
+      }
+    },
+
     // Schema & Index Management
     {
       path: '/data/v1/action/listCollections',
