@@ -192,6 +192,20 @@ const ApiExplorer: React.FC = () => {
       requiresAuth: true
     },
     {
+      path: '/data/v1/action/distinct',
+      method: 'POST',
+      category: 'Aggregation & Querying',
+      description: 'Get distinct values for a field in a collection',
+      exampleRequest: {
+        dataSource: 'Cluster0',
+        database: 'sample_airbnb',
+        collection: 'listingsAndReviews',
+        field: 'property_type',
+        filter: { price: { $lt: 100 } }
+      },
+      requiresAuth: true
+    },
+    {
       path: '/data/v1/action/countDocuments',
       method: 'POST',
       category: 'Aggregation & Querying',
@@ -213,6 +227,84 @@ const ApiExplorer: React.FC = () => {
         dataSource: 'Cluster0',
         database: 'sample_airbnb',
         collection: 'listingsAndReviews'
+      },
+      requiresAuth: true
+    },
+
+    // FindAndModify Operations
+    {
+      path: '/data/v1/action/findOneAndDelete',
+      method: 'POST',
+      category: 'FindAndModify Operations',
+      description: 'Find a document and delete it in one atomic operation',
+      exampleRequest: {
+        dataSource: 'Cluster0',
+        database: 'sample_airbnb',
+        collection: 'listingsAndReviews',
+        filter: { _id: 'ObjectId("...")' },
+        projection: { name: 1, price: 1 }
+      },
+      requiresAuth: true
+    },
+    {
+      path: '/data/v1/action/findOneAndReplace',
+      method: 'POST',
+      category: 'FindAndModify Operations',
+      description: 'Find a document and replace it in one atomic operation',
+      exampleRequest: {
+        dataSource: 'Cluster0',
+        database: 'sample_airbnb',
+        collection: 'listingsAndReviews',
+        filter: { _id: 'ObjectId("...")' },
+        replacement: { name: 'New Listing', price: 250 },
+        returnNewDocument: true
+      },
+      requiresAuth: true
+    },
+    {
+      path: '/data/v1/action/findOneAndUpdate',
+      method: 'POST',
+      category: 'FindAndModify Operations',
+      description: 'Find a document and update it in one atomic operation',
+      exampleRequest: {
+        dataSource: 'Cluster0',
+        database: 'sample_airbnb',
+        collection: 'listingsAndReviews',
+        filter: { _id: 'ObjectId("...")' },
+        update: { $set: { price: 175 } },
+        returnNewDocument: true
+      },
+      requiresAuth: true
+    },
+
+    // Bulk Operations
+    {
+      path: '/data/v1/action/bulkWrite',
+      method: 'POST',
+      category: 'Bulk Operations',
+      description: 'Perform multiple write operations in a single request',
+      exampleRequest: {
+        dataSource: 'Cluster0',
+        database: 'sample_airbnb',
+        collection: 'listingsAndReviews',
+        operations: [
+          {
+            insertOne: {
+              document: { name: 'New Listing 1', price: 100 }
+            }
+          },
+          {
+            updateOne: {
+              filter: { _id: 'ObjectId("...")' },
+              update: { $set: { price: 150 } }
+            }
+          },
+          {
+            deleteOne: {
+              filter: { _id: 'ObjectId("...")' }
+            }
+          }
+        ]
       },
       requiresAuth: true
     },
