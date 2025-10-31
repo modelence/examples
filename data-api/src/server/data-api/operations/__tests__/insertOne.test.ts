@@ -46,23 +46,24 @@ describe('insertOne', () => {
     });
   });
 
-  it('should return 400 if dataSource is missing', async () => {
+  it('should work when dataSource is missing (optional field)', async () => {
     const params = mockRouteParams({
       database: 'test-db',
       collection: 'test-collection',
       document: { name: 'Test' },
     });
 
+    const insertedId = new ObjectId();
+    mockCollection.insertOne.mockResolvedValue({ insertedId, acknowledged: true });
+
     const result = await insertOne(params);
 
     expect(result).toEqual({
-      status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, document',
-        error_code: 'InvalidParameter',
+        insertedId: insertedId.toString(),
       },
     });
-    expect(mockGetDatabase).not.toHaveBeenCalled();
+    expect(mockGetDatabase).toHaveBeenCalledWith('test-db');
   });
 
   it('should return 400 if database is missing', async () => {
@@ -77,7 +78,7 @@ describe('insertOne', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, document',
+        error: 'Invalid input: expected string, received undefined',
         error_code: 'InvalidParameter',
       },
     });
@@ -95,7 +96,7 @@ describe('insertOne', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, document',
+        error: 'Invalid input: expected string, received undefined',
         error_code: 'InvalidParameter',
       },
     });
@@ -113,7 +114,7 @@ describe('insertOne', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, document',
+        error: 'document is required',
         error_code: 'InvalidParameter',
       },
     });

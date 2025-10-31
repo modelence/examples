@@ -213,21 +213,24 @@ describe('find', () => {
     });
   });
 
-  it('should return 400 if required fields are missing', async () => {
+  it('should work when dataSource is missing (optional field)', async () => {
     const params = mockRouteParams({
       database: 'test-db',
       collection: 'test-collection',
     });
 
+    mockCollection.find.mockReturnValue({
+      toArray: jest.fn().mockResolvedValue([{ _id: new ObjectId(), name: 'Test' }]),
+    } as any);
+
     const result = await find(params);
 
     expect(result).toEqual({
-      status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection',
-        error_code: 'InvalidParameter',
+        documents: [{ _id: expect.any(Object), name: 'Test' }],
       },
     });
+    expect(mockGetDatabase).toHaveBeenCalledWith('test-db');
   });
 
   it('should return 500 on database error', async () => {

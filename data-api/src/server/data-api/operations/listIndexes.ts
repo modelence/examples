@@ -1,6 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
 import { getDatabase } from '../mongoClient';
-import { ErrorResponse } from '../utils';
+import { ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface ListIndexesRequest {
   dataSource: string;
@@ -22,19 +22,11 @@ interface ListIndexesResponse {
 }
 
 export async function listIndexes(params: RouteParams): Promise<RouteResponse<ListIndexesResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const { dataSource, database, collection } = params.body as ListIndexesRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection",
-          error_code: "InvalidParameter"
-        }
-      };
-    }
+    validateRequiredMongoFields({ dataSource, database, collection });
 
     // Connect to MongoDB and get collection
     const db = await getDatabase(database);
@@ -48,13 +40,5 @@ export async function listIndexes(params: RouteParams): Promise<RouteResponse<Li
         indexes
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { ErrorResponse } from '../utils';
+import { ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface CreateIndexRequest {
   dataSource: string;
@@ -24,41 +25,25 @@ interface CreateIndexResponse {
 }
 
 export async function createIndex(params: RouteParams): Promise<RouteResponse<CreateIndexResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const { dataSource, database, collection, keys, options = {} } = params.body as CreateIndexRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection || !keys) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection, keys",
-          error_code: "InvalidParameter"
-        }
-      };
+    validateRequiredMongoFields({ dataSource, database, collection });
+
+    if (!keys) {
+      throw new ValidationError("keys is required");
     }
 
     // Validate keys is an object
     if (typeof keys !== 'object' || Array.isArray(keys)) {
-      return {
-        status: 400,
-        data: {
-          error: "keys must be an object specifying field names and index directions",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("keys must be an object specifying field names and index directions");
     }
 
     // Validate index key values
     for (const [field, direction] of Object.entries(keys)) {
       if (direction !== 1 && direction !== -1 && direction !== '2d' && direction !== '2dsphere' && direction !== 'text' && direction !== 'hashed') {
-        return {
-          status: 400,
-          data: {
-            error: `Invalid index direction for field '${field}': must be 1, -1, '2d', '2dsphere', 'text', or 'hashed'`,
-            error_code: "InvalidParameter"
-          }
-        };
+        throw new ValidationError(`Invalid index direction for field '${field}': must be 1, -1, '2d', '2dsphere', 'text', or 'hashed'`);
       }
     }
 
@@ -85,13 +70,5 @@ export async function createIndex(params: RouteParams): Promise<RouteResponse<Cr
         ok: 1
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

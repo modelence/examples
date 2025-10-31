@@ -88,7 +88,7 @@ describe('listDatabases', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required field: dataSource',
+        error: 'dataSource is required',
         error_code: 'InvalidParameter',
       },
     });

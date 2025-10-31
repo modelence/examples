@@ -104,7 +104,7 @@ describe('distinct', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, key',
+        error: 'key is required',
         error_code: 'InvalidParameter',
       },
     });

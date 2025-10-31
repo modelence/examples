@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { processFilter, ErrorResponse } from '../utils';
+import { processFilter, ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface FindOneAndDeleteRequest {
   dataSource: string;
@@ -16,7 +17,7 @@ interface FindOneAndDeleteResponse {
 }
 
 export async function findOneAndDelete(params: RouteParams): Promise<RouteResponse<FindOneAndDeleteResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const {
       dataSource,
       database,
@@ -27,14 +28,10 @@ export async function findOneAndDelete(params: RouteParams): Promise<RouteRespon
     } = params.body as FindOneAndDeleteRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection || !filter) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection, filter",
-          error_code: "InvalidParameter"
-        }
-      };
+    validateRequiredMongoFields({ dataSource, database, collection });
+
+    if (!filter) {
+      throw new ValidationError("filter is required");
     }
 
     // Connect to MongoDB and get collection
@@ -61,13 +58,5 @@ export async function findOneAndDelete(params: RouteParams): Promise<RouteRespon
         document: result || null
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

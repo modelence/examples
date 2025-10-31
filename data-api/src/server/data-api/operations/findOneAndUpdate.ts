@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { processFilter, processUpdate, ErrorResponse } from '../utils';
+import { processFilter, processUpdate, ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface FindOneAndUpdateRequest {
   dataSource: string;
@@ -19,7 +20,7 @@ interface FindOneAndUpdateResponse {
 }
 
 export async function findOneAndUpdate(params: RouteParams): Promise<RouteResponse<FindOneAndUpdateResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const {
       dataSource,
       database,
@@ -33,26 +34,20 @@ export async function findOneAndUpdate(params: RouteParams): Promise<RouteRespon
     } = params.body as FindOneAndUpdateRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection || !filter || !update) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection, filter, update",
-          error_code: "InvalidParameter"
-        }
-      };
+    validateRequiredMongoFields({ dataSource, database, collection });
+
+    if (!filter) {
+      throw new ValidationError("filter is required");
+    }
+
+    if (!update) {
+      throw new ValidationError("update is required");
     }
 
     // Validate update operators
     const hasValidOperator = Object.keys(update).some(key => key.startsWith('$'));
     if (!hasValidOperator) {
-      return {
-        status: 400,
-        data: {
-          error: "update must contain at least one update operator (e.g., $set, $inc, $push)",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("update must contain at least one update operator (e.g., $set, $inc, $push)");
     }
 
     // Connect to MongoDB and get collection
@@ -83,13 +78,5 @@ export async function findOneAndUpdate(params: RouteParams): Promise<RouteRespon
         document: result || null
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

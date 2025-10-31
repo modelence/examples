@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { processFilter, ErrorResponse } from '../utils';
+import { processFilter, ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface DistinctRequest {
   dataSource: string;
@@ -15,7 +16,7 @@ interface DistinctResponse {
 }
 
 export async function distinct(params: RouteParams): Promise<RouteResponse<DistinctResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const {
       dataSource,
       database,
@@ -25,25 +26,15 @@ export async function distinct(params: RouteParams): Promise<RouteResponse<Disti
     } = params.body as DistinctRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection || !key) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection, key",
-          error_code: "InvalidParameter"
-        }
-      };
+    validateRequiredMongoFields({ dataSource, database, collection });
+
+    if (!key) {
+      throw new ValidationError("key is required");
     }
 
     // Validate key is a string
     if (typeof key !== 'string') {
-      return {
-        status: 400,
-        data: {
-          error: "key must be a string representing the field name",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("key must be a string representing the field name");
     }
 
     // Connect to MongoDB and get collection
@@ -61,13 +52,5 @@ export async function distinct(params: RouteParams): Promise<RouteResponse<Disti
         values
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { processFilter, ErrorResponse } from '../utils';
+import { processFilter, ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface FindOneAndReplaceRequest {
   dataSource: string;
@@ -19,7 +20,7 @@ interface FindOneAndReplaceResponse {
 }
 
 export async function findOneAndReplace(params: RouteParams): Promise<RouteResponse<FindOneAndReplaceResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const {
       dataSource,
       database,
@@ -33,26 +34,20 @@ export async function findOneAndReplace(params: RouteParams): Promise<RouteRespo
     } = params.body as FindOneAndReplaceRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection || !filter || !replacement) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection, filter, replacement",
-          error_code: "InvalidParameter"
-        }
-      };
+    validateRequiredMongoFields({ dataSource, database, collection });
+
+    if (!filter) {
+      throw new ValidationError("filter is required");
+    }
+
+    if (!replacement) {
+      throw new ValidationError("replacement is required");
     }
 
     // Validate replacement document doesn't contain update operators
     const hasUpdateOperator = Object.keys(replacement).some(key => key.startsWith('$'));
     if (hasUpdateOperator) {
-      return {
-        status: 400,
-        data: {
-          error: "replacement document cannot contain update operators (keys starting with $)",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("replacement document cannot contain update operators (keys starting with $)");
     }
 
     // Connect to MongoDB and get collection
@@ -82,13 +77,5 @@ export async function findOneAndReplace(params: RouteParams): Promise<RouteRespo
         document: result || null
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

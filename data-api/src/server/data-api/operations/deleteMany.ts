@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { processFilter, ErrorResponse } from '../utils';
+import { processFilter, ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface DeleteManyRequest {
   dataSource: string;
@@ -14,18 +15,14 @@ interface DeleteManyResponse {
 }
 
 export async function deleteMany(params: RouteParams): Promise<RouteResponse<DeleteManyResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const { dataSource, database, collection, filter } = params.body as DeleteManyRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection || !filter) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection, filter",
-          error_code: "InvalidParameter"
-        }
-      };
+    validateRequiredMongoFields({ dataSource, database, collection });
+
+    if (!filter) {
+      throw new ValidationError("filter is required");
     }
 
     // Connect to MongoDB and get collection
@@ -43,13 +40,5 @@ export async function deleteMany(params: RouteParams): Promise<RouteResponse<Del
         deletedCount: result.deletedCount
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

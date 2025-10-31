@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { ErrorResponse } from '../utils';
+import { ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface AggregateRequest {
   dataSource: string;
@@ -14,29 +15,19 @@ interface AggregateResponse {
 }
 
 export async function aggregate(params: RouteParams): Promise<RouteResponse<AggregateResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const { dataSource, database, collection, pipeline } = params.body as AggregateRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection || !pipeline) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection, pipeline",
-          error_code: "InvalidParameter"
-        }
-      };
+    validateRequiredMongoFields({ dataSource, database, collection });
+
+    if (!pipeline) {
+      throw new ValidationError("pipeline is required");
     }
 
     // Validate pipeline is an array
     if (!Array.isArray(pipeline)) {
-      return {
-        status: 400,
-        data: {
-          error: "pipeline must be an array of aggregation stages",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("pipeline must be an array of aggregation stages");
     }
 
     // Connect to MongoDB and get collection
@@ -51,13 +42,5 @@ export async function aggregate(params: RouteParams): Promise<RouteResponse<Aggr
         documents
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

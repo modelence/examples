@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { ErrorResponse } from '../utils';
+import { ErrorResponse, withErrorHandling } from '../utils';
 
 interface RunCommandRequest {
   dataSource: string;
@@ -13,35 +14,31 @@ interface RunCommandResponse {
 }
 
 export async function runCommand(params: RouteParams): Promise<RouteResponse<RunCommandResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const { dataSource, database, command } = params.body as RunCommandRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !command) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, command",
-          error_code: "InvalidParameter"
-        }
-      };
+    if (!dataSource) {
+      throw new ValidationError("dataSource is required");
+    }
+
+    if (!database) {
+      throw new ValidationError("database is required");
+    }
+
+    if (!command) {
+      throw new ValidationError("command is required");
     }
 
     // Validate command is an object
     if (typeof command !== 'object' || Array.isArray(command)) {
-      return {
-        status: 400,
-        data: {
-          error: "command must be an object",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("command must be an object");
     }
 
     // Security: Restrict certain dangerous commands
     const restrictedCommands = ['shutdown', 'dropDatabase', 'eval', 'mapReduce', 'fsync'];
     const commandName = Object.keys(command)[0]?.toLowerCase();
-    
+
     if (restrictedCommands.includes(commandName)) {
       return {
         status: 403,
@@ -63,13 +60,5 @@ export async function runCommand(params: RouteParams): Promise<RouteResponse<Run
         result
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

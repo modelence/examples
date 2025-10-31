@@ -71,7 +71,7 @@ describe('insertMany', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, documents (array)',
+        error: 'documents must be an array',
         error_code: 'InvalidParameter',
       },
     });
@@ -98,22 +98,29 @@ describe('insertMany', () => {
     expect(mockGetDatabase).not.toHaveBeenCalled();
   });
 
-  it('should return 400 if dataSource is missing', async () => {
+  it('should work when dataSource is missing (optional field)', async () => {
     const params = mockRouteParams({
       database: 'test-db',
       collection: 'test-collection',
       documents: [{ name: 'Test' }],
     });
 
+    const insertedId1 = new ObjectId();
+    const insertedId2 = new ObjectId();
+    mockCollection.insertMany.mockResolvedValue({
+      insertedIds: { 0: insertedId1, 1: insertedId2 },
+      insertedCount: 2,
+      acknowledged: true,
+    });
+
     const result = await insertMany(params);
 
     expect(result).toEqual({
-      status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, documents (array)',
-        error_code: 'InvalidParameter',
+        insertedIds: [insertedId1.toString(), insertedId2.toString()],
       },
     });
+    expect(mockGetDatabase).toHaveBeenCalledWith('test-db');
   });
 
   it('should return 500 on database error', async () => {
