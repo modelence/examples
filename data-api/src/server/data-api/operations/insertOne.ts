@@ -1,5 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
+import { ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface InsertOneRequest {
   dataSource: string;
@@ -12,24 +14,15 @@ interface InsertOneResponse {
   insertedId: string;
 }
 
-interface ErrorResponse {
-  error: string;
-  error_code: string;
-}
-
 export async function insertOne(params: RouteParams): Promise<RouteResponse<InsertOneResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const { dataSource, database, collection, document } = params.body as InsertOneRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection || !document) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection, document",
-          error_code: "InvalidParameter"
-        }
-      };
+    validateRequiredMongoFields({ dataSource, database, collection });
+
+    if (!document) {
+      throw new ValidationError("document is required");
     }
 
     // Connect to MongoDB and get collection
@@ -44,13 +37,5 @@ export async function insertOne(params: RouteParams): Promise<RouteResponse<Inse
         insertedId: result.insertedId.toString()
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

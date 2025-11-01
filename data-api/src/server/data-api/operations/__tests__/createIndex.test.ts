@@ -157,7 +157,7 @@ describe('createIndex', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, keys',
+        error: 'keys is required',
         error_code: 'InvalidParameter',
       },
     });

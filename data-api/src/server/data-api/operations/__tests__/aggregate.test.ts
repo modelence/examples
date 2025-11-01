@@ -134,7 +134,7 @@ describe('aggregate', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, pipeline',
+        error: 'pipeline is required',
         error_code: 'InvalidParameter',
       },
     });

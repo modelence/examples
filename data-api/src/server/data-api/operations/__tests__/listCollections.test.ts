@@ -100,7 +100,7 @@ describe('listCollections', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database',
+        error: 'database is required',
         error_code: 'InvalidParameter',
       },
     });

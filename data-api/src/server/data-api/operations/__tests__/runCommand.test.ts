@@ -152,7 +152,7 @@ describe('runCommand', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, command',
+        error: 'command is required',
         error_code: 'InvalidParameter',
       },
     });

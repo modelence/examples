@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { processFilter, processUpdate, ErrorResponse } from '../utils';
+import { processFilter, processUpdate, ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 import { AnyBulkWriteOperation, ObjectId } from 'mongodb';
 
 interface BulkWriteOperation {
@@ -48,7 +49,7 @@ interface BulkWriteResponse {
 }
 
 export async function bulkWrite(params: RouteParams): Promise<RouteResponse<BulkWriteResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const {
       dataSource,
       database,
@@ -58,25 +59,15 @@ export async function bulkWrite(params: RouteParams): Promise<RouteResponse<Bulk
     } = params.body as BulkWriteRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection || !operations) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection, operations",
-          error_code: "InvalidParameter"
-        }
-      };
+    validateRequiredMongoFields({ dataSource, database, collection });
+
+    if (!operations) {
+      throw new ValidationError("operations is required");
     }
 
     // Validate operations is an array
     if (!Array.isArray(operations) || operations.length === 0) {
-      return {
-        status: 400,
-        data: {
-          error: "operations must be a non-empty array",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("operations must be a non-empty array");
     }
 
     // Connect to MongoDB and get collection
@@ -128,7 +119,7 @@ export async function bulkWrite(params: RouteParams): Promise<RouteResponse<Bulk
           }
         };
       } else {
-        throw new Error('Invalid operation type');
+        throw new ValidationError('Invalid operation type');
       }
     });
 
@@ -153,13 +144,5 @@ export async function bulkWrite(params: RouteParams): Promise<RouteResponse<Bulk
         upsertedIds
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

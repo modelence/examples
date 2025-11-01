@@ -255,7 +255,7 @@ describe('bulkWrite', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, operations',
+        error: 'Invalid input: expected string, received undefined',
         error_code: 'InvalidParameter',
       },
     });

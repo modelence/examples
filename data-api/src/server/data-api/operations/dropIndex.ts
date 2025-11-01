@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { ErrorResponse } from '../utils';
+import { ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface DropIndexRequest {
   dataSource: string;
@@ -15,29 +16,19 @@ interface DropIndexResponse {
 }
 
 export async function dropIndex(params: RouteParams): Promise<RouteResponse<DropIndexResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const { dataSource, database, collection, index } = params.body as DropIndexRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection || !index) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection, index",
-          error_code: "InvalidParameter"
-        }
-      };
+    validateRequiredMongoFields({ dataSource, database, collection });
+
+    if (!index) {
+      throw new ValidationError("index is required");
     }
 
     // Validate index name
     if (index === '_id_') {
-      return {
-        status: 400,
-        data: {
-          error: "Cannot drop the _id_ index",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("Cannot drop the _id_ index");
     }
 
     // Connect to MongoDB and get collection
@@ -57,13 +48,5 @@ export async function dropIndex(params: RouteParams): Promise<RouteResponse<Drop
         ok: 1
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

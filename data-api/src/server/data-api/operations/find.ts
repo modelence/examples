@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { processFilter, ErrorResponse } from '../utils';
+import { processFilter, ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface FindRequest {
   dataSource: string;
@@ -19,48 +20,28 @@ interface FindResponse {
 
 
 export async function find(params: RouteParams): Promise<RouteResponse<FindResponse | ErrorResponse>> {
-  try {
-    const { 
-      dataSource, 
-      database, 
-      collection, 
-      filter = {}, 
-      projection, 
-      sort, 
-      limit, 
-      skip 
+  return withErrorHandling(async () => {
+    const {
+      dataSource,
+      database,
+      collection,
+      filter = {},
+      projection,
+      sort,
+      limit,
+      skip
     } = params.body as FindRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection",
-          error_code: "InvalidParameter"
-        }
-      };
-    }
+    validateRequiredMongoFields({ dataSource, database, collection });
 
     // Validate limit and skip if provided
     if (limit !== undefined && (limit < 0 || limit > 50000)) {
-      return {
-        status: 400,
-        data: {
-          error: "limit must be between 0 and 50000",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("limit must be between 0 and 50000");
     }
 
     if (skip !== undefined && skip < 0) {
-      return {
-        status: 400,
-        data: {
-          error: "skip must be >= 0",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("skip must be >= 0");
     }
 
     // Connect to MongoDB and get collection
@@ -85,13 +66,5 @@ export async function find(params: RouteParams): Promise<RouteResponse<FindRespo
         documents
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

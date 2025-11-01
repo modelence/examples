@@ -80,7 +80,7 @@ describe('dropIndex', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, index',
+        error: 'index is required',
         error_code: 'InvalidParameter',
       },
     });

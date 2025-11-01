@@ -87,7 +87,7 @@ describe('deleteOne', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, filter',
+        error: 'filter is required',
         error_code: 'InvalidParameter',
       },
     });

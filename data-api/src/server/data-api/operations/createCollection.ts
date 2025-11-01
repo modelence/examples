@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { ErrorResponse } from '../utils';
+import { ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface CreateCollectionRequest {
   dataSource: string;
@@ -13,29 +14,15 @@ interface CreateCollectionResponse {
 }
 
 export async function createCollection(params: RouteParams): Promise<RouteResponse<CreateCollectionResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const { dataSource, database, collection } = params.body as CreateCollectionRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection",
-          error_code: "InvalidParameter"
-        }
-      };
-    }
+    validateRequiredMongoFields({ dataSource, database, collection });
 
     // Validate collection name
     if (collection.includes('$') || collection.startsWith('system.')) {
-      return {
-        status: 400,
-        data: {
-          error: "Invalid collection name: cannot contain '$' or start with 'system.'",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("Invalid collection name: cannot contain '$' or start with 'system.'");
     }
 
     // Connect to MongoDB and get database
@@ -49,13 +36,5 @@ export async function createCollection(params: RouteParams): Promise<RouteRespon
         ok: 1
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

@@ -1,6 +1,6 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
 import { getDatabase } from '../mongoClient';
-import { processFilter, ErrorResponse } from '../utils';
+import { processFilter, ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface CountDocumentsRequest {
   dataSource: string;
@@ -14,19 +14,11 @@ interface CountDocumentsResponse {
 }
 
 export async function countDocuments(params: RouteParams): Promise<RouteResponse<CountDocumentsResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const { dataSource, database, collection, filter = {} } = params.body as CountDocumentsRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection",
-          error_code: "InvalidParameter"
-        }
-      };
-    }
+    validateRequiredMongoFields({ dataSource, database, collection });
 
     // Connect to MongoDB and get collection
     const db = await getDatabase(database);
@@ -43,13 +35,5 @@ export async function countDocuments(params: RouteParams): Promise<RouteResponse
         count
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
-import { ErrorResponse } from '../utils';
+import { ErrorResponse, withErrorHandling } from '../utils';
 
 interface ListCollectionsRequest {
   dataSource: string;
@@ -17,18 +18,16 @@ interface ListCollectionsResponse {
 }
 
 export async function listCollections(params: RouteParams): Promise<RouteResponse<ListCollectionsResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const { dataSource, database } = params.body as ListCollectionsRequest;
 
     // Validate required fields
-    if (!dataSource || !database) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database",
-          error_code: "InvalidParameter"
-        }
-      };
+    if (!dataSource) {
+      throw new ValidationError("dataSource is required");
+    }
+
+    if (!database) {
+      throw new ValidationError("database is required");
     }
 
     // Connect to MongoDB and get database
@@ -47,13 +46,5 @@ export async function listCollections(params: RouteParams): Promise<RouteRespons
         collections
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }

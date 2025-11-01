@@ -106,22 +106,23 @@ describe('findOne', () => {
     expect(mockCollection.findOne).toHaveBeenCalledWith({}, {});
   });
 
-  it('should return 400 if required fields are missing', async () => {
+  it('should work when dataSource is missing (optional field)', async () => {
     const params = mockRouteParams({
       database: 'test-db',
       collection: 'test-collection',
     });
 
+    const document = { _id: new ObjectId(), name: 'Test' };
+    mockCollection.findOne.mockResolvedValue(document);
+
     const result = await findOne(params);
 
     expect(result).toEqual({
-      status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection',
-        error_code: 'InvalidParameter',
+        document: { _id: expect.any(Object), name: 'Test' },
       },
     });
-    expect(mockGetDatabase).not.toHaveBeenCalled();
+    expect(mockGetDatabase).toHaveBeenCalledWith('test-db');
   });
 
   it('should return 500 on database error', async () => {

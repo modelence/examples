@@ -161,7 +161,7 @@ describe('findOneAndUpdate', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection, filter, update',
+        error: 'filter is required',
         error_code: 'InvalidParameter',
       },
     });

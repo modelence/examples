@@ -66,7 +66,7 @@ describe('dropCollection', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Missing required fields: dataSource, database, collection',
+        error: 'Invalid input: expected string, received undefined',
         error_code: 'InvalidParameter',
       },
     });

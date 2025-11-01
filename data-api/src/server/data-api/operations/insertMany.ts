@@ -1,5 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
+import { ValidationError } from 'modelence';
 import { getDatabase } from '../mongoClient';
+import { ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
 
 interface InsertManyRequest {
   dataSource: string;
@@ -12,34 +14,19 @@ interface InsertManyResponse {
   insertedIds: string[];
 }
 
-interface ErrorResponse {
-  error: string;
-  error_code: string;
-}
-
 export async function insertMany(params: RouteParams): Promise<RouteResponse<InsertManyResponse | ErrorResponse>> {
-  try {
+  return withErrorHandling(async () => {
     const { dataSource, database, collection, documents } = params.body as InsertManyRequest;
 
     // Validate required fields
-    if (!dataSource || !database || !collection || !documents || !Array.isArray(documents)) {
-      return {
-        status: 400,
-        data: {
-          error: "Missing required fields: dataSource, database, collection, documents (array)",
-          error_code: "InvalidParameter"
-        }
-      };
+    validateRequiredMongoFields({ dataSource, database, collection });
+
+    if (!documents || !Array.isArray(documents)) {
+      throw new ValidationError("documents must be an array");
     }
 
     if (documents.length === 0) {
-      return {
-        status: 400,
-        data: {
-          error: "documents array cannot be empty",
-          error_code: "InvalidParameter"
-        }
-      };
+      throw new ValidationError("documents array cannot be empty");
     }
 
     // Connect to MongoDB and get collection
@@ -54,13 +41,5 @@ export async function insertMany(params: RouteParams): Promise<RouteResponse<Ins
         insertedIds: Object.values(result.insertedIds).map(id => id.toString())
       }
     };
-  } catch (error) {
-    return {
-      status: 500,
-      data: {
-        error: error instanceof Error ? error.message : "Internal server error",
-        error_code: "InternalServerError"
-      }
-    };
-  }
+  });
 }
