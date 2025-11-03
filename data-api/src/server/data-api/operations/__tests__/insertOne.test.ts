@@ -46,8 +46,9 @@ describe('insertOne', () => {
     });
   });
 
-  it('should work when dataSource is missing (optional field)', async () => {
+  it('should work with all required fields', async () => {
     const params = mockRouteParams({
+      dataSource: 'test-datasource',
       database: 'test-db',
       collection: 'test-collection',
       document: { name: 'Test' },
@@ -78,7 +79,7 @@ describe('insertOne', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Invalid input: expected string, received undefined',
+        error: 'database is required',
         error_code: 'InvalidParameter',
       },
     });
@@ -96,7 +97,7 @@ describe('insertOne', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Invalid input: expected string, received undefined',
+        error: 'collection is required',
         error_code: 'InvalidParameter',
       },
     });

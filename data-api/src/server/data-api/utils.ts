@@ -11,6 +11,7 @@ export interface ErrorResponse {
 
 // Zod schema for validating required MongoDB operation fields
 const requiredMongoFieldsSchema = z.object({
+  dataSource: z.string().min(1, { message: "dataSource is required" }),
   database: z.string().min(1, { message: "database is required" }),
   collection: z.string().min(1, { message: "collection is required" })
 });
@@ -27,7 +28,15 @@ export function validateRequiredMongoFields(fields: unknown): void {
 
   if (!result.success) {
     const firstError = result.error.issues[0];
-    throw new ValidationError(firstError.message);
+    const fieldPath = firstError.path.join('.');
+
+    // For missing fields (undefined), provide a clear error message with the field name
+    let errorMessage = firstError.message;
+    if (firstError.code === 'invalid_type' && errorMessage.includes('received undefined')) {
+      errorMessage = `${fieldPath} is required`;
+    }
+
+    throw new ValidationError(errorMessage);
   }
 }
 
