@@ -98,8 +98,9 @@ describe('insertMany', () => {
     expect(mockGetDatabase).not.toHaveBeenCalled();
   });
 
-  it('should work when dataSource is missing (optional field)', async () => {
+  it('should work with all required fields', async () => {
     const params = mockRouteParams({
+      dataSource: 'test-datasource',
       database: 'test-db',
       collection: 'test-collection',
       documents: [{ name: 'Test' }],

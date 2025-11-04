@@ -69,7 +69,7 @@ describe('estimatedDocumentCount', () => {
     expect(result).toEqual({
       status: 400,
       data: {
-        error: 'Invalid input: expected string, received undefined',
+        error: 'collection is required',
         error_code: 'InvalidParameter',
       },
     });
