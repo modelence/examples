@@ -30,14 +30,6 @@ A minimal Modelence project template with the essential setup. Perfect starting 
 - React and React Router setup
 - Tailwind CSS styling
 
-### [sandbox](sandbox/)
-An experimental playground for testing and prototyping Modelence features.
-
-**Key Features:**
-- Minimal dependencies
-- Quick experimentation environment
-- Standard Modelence dev setup
-
 ### [todo-app](todo-app/)
 A comprehensive todo application built with Next.js and Modelence, demonstrating full-stack development patterns.
 
@@ -64,6 +56,39 @@ Demonstrates integration with Voyage AI for embeddings and semantic search capab
 - MongoDB for vector storage
 - React Query for data fetching
 - Semantic search implementation
+
+### [sandbox](sandbox/)
+An experimental playground for testing and prototyping Modelence features.
+
+**Key Features:**
+- Minimal dependencies
+- Quick experimentation environment
+- Standard Modelence dev setup
+
+
+## Getting Started
+
+Each example project can be run independently:
+
+```bash
+cd <project-name>
+npm install
+npm run dev
+```
+
+Build for production:
+```bash
+npm run build
+npm start
+```
+
+## Common Commands
+
+All projects support these standard commands:
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Run production build
+- `npm test` - Run tests (where configured)
 
 ## Updating Package Versions
 
@@ -125,27 +150,3 @@ Update a Modelence plugin to a specific version:
 ```bash
 ./update-package.sh @modelence/react-query 1.0.3
 ```
-
-## Getting Started
-
-Each example project can be run independently:
-
-```bash
-cd <project-name>
-npm install
-npm run dev
-```
-
-Build for production:
-```bash
-npm run build
-npm start
-```
-
-## Common Commands
-
-All projects support these standard commands:
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm start` - Run production build
-- `npm test` - Run tests (where configured)
