@@ -10,8 +10,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "modelence": "^0.5.6",
-    "mongodb": "^6.18.0",
+    "modelence": "^0.6.20",
+    "mongodb": "^6.19.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
