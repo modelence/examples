@@ -1,6 +1,7 @@
 import { RouteParams, RouteResponse } from 'modelence/server';
 import { ValidationError } from 'modelence';
 import { ErrorResponse, withErrorHandling } from '../utils';
+import { getMongoClient } from '../mongoClient';
 
 interface ListDatabasesRequest {
   dataSource: string;
