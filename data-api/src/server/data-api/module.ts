@@ -43,11 +43,6 @@ export default new Module('dataApi', {
       isPublic: false,
       default: 'api-key-123',
     },
-    mongodbUri: {
-      type: 'string',
-      isPublic: false,
-      default: 'mongodb://localhost:27017/data-api',
-    },
   },
   routes: [
     // Authentication

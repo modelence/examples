@@ -24,10 +24,7 @@ let currentUri: string = '';
 export async function getMongoClient(): Promise<any> {
   await initMongoDB();
   
-  const uri = getConfig('dataApi.mongodbUri') as string || process.env.DATA_API_MONGODB_URI;
-  if (!uri) {
-    throw new Error('MongoDB URI not configured in dataApi.mongodbUri or DATA_API_MONGODB_URI environment variable');
-  }
+  const uri = getConfig('_system.mongodbUri') as string;
   
   // Check if URI has changed or if client is closed
   if (!client || currentUri !== uri || !client.topology || !client.topology.isConnected()) {
