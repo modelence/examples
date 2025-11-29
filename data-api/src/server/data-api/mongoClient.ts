@@ -1,36 +1,14 @@
 import { getConfig } from 'modelence/server';
+import { MongoClient } from 'mongodb';
 
-// Use dynamic import to avoid ES module bundling issues
-let MongoClient: any;
-let Db: any;
-
-// Initialize MongoDB types dynamically
-async function initMongoDB() {
-  if (!MongoClient) {
-    try {
-      const mongodb = await import('mongodb');
-      MongoClient = mongodb.MongoClient;
-      Db = mongodb.Db;
-    } catch (error) {
-      console.error('Failed to import MongoDB:', error);
-      throw new Error('MongoDB driver not available');
-    }
-  }
-}
-
-let client: any = null;
+let client: MongoClient | null = null;
 let currentUri: string = '';
 
-export async function getMongoClient(): Promise<any> {
-  await initMongoDB();
+export async function getMongoClient(): Promise<MongoClient> {
+  const uri = getConfig('_system.mongodbUri') as string;
   
-  const uri = getConfig('dataApi.mongodbUri') as string || process.env.DATA_API_MONGODB_URI;
-  if (!uri) {
-    throw new Error('MongoDB URI not configured in dataApi.mongodbUri or DATA_API_MONGODB_URI environment variable');
-  }
-  
-  // Check if URI has changed or if client is closed
-  if (!client || currentUri !== uri || !client.topology || !client.topology.isConnected()) {
+  // Check if URI has changed or if client doesn't exist
+  if (!client || currentUri !== uri) {
     // Close existing connection if it exists
     if (client) {
       try {
@@ -59,8 +37,7 @@ export async function getMongoClient(): Promise<any> {
   return client;
 }
 
-export async function getDatabase(databaseName: string): Promise<any> {
-  await initMongoDB();
+export async function getDatabase(databaseName: string) {
   const mongoClient = await getMongoClient();
   return mongoClient.db(databaseName);
 }
