@@ -365,7 +365,9 @@ const ApiExplorer: React.FC = () => {
         database: 'sample_airbnb',
         collection: 'listingsAndReviews',
         keys: { price: 1 },
-        name: 'price_index'
+        options: {
+          name: 'price_index',
+        },
       },
       requiresAuth: true
     },
