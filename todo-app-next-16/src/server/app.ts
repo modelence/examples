@@ -13,4 +13,5 @@ startApp({
       await createInitialData();
     },
   }],
+  shouldStartServer: false,
 });

@@ -42,3 +42,6 @@ next-env.d.ts
 .modelence.*.env
 
 .DS_Store
+
+.yalc
+yalc.lock

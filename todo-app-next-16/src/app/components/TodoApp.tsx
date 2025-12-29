@@ -1,7 +1,7 @@
 'use client';
 
-import { modelenceMutation, modelenceQuery } from '@modelence/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { getAllTodos, setCompleted as setCompletedAction } from '@/server/todos/actions';
 import TodoList from './TodoList';
 
 interface Todo {
@@ -11,8 +11,13 @@ interface Todo {
 }
 
 export default function TodoApp() {
-  const { data: todos, refetch: refetchTodos, isFetching, error } = useQuery(modelenceQuery<Todo[]>('todos.getAll'));
-  const { mutateAsync: setCompleted } = useMutation(modelenceMutation('todos.setCompleted'));
+  const { data: todos, refetch: refetchTodos, isFetching, error } = useQuery({
+    queryKey: ['todos'],
+    queryFn: getAllTodos,
+  });
+  const { mutateAsync: setCompleted } = useMutation({
+    mutationFn: setCompletedAction,
+  });
 
   if (error) return <div>Error: {error.message}</div>;
   if (!todos && !isFetching) return <div>No todos found</div>;
