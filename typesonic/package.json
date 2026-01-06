@@ -49,7 +49,7 @@
     "ai": "^4.1.16",
     "clsx": "^2.1.1",
     "cookie-parser": "^1.4.6",
-    "modelence": "^0.7.2",
+    "modelence": "^0.10.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.4.1",
