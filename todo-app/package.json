@@ -14,7 +14,7 @@
     "@modelence/next": "^1.0.3",
     "@modelence/react-query": "^1.0.2",
     "@tanstack/react-query": "^5.81.5",
-    "modelence": "^0.7.2",
+    "modelence": "^0.10.2",
     "next": "^15.5.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
