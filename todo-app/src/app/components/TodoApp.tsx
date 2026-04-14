@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { modelenceMutation, modelenceQuery } from '@modelence/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { todos as todosModule } from '@modelence/modules';
 import AddTodoForm from './AddTodoForm';
 import TodoList from './TodoList';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
@@ -16,11 +16,13 @@ interface Todo {
 export default function TodoApp() {
   const [todoToDelete, setTodoToDelete] = useState<Todo | null>(null);
 
-  const { data: todos, refetch: refetchTodos, isFetching, error } = useQuery(modelenceQuery<Todo[]>('todos.getAll'));
-  const { mutateAsync: setCompleted } = useMutation(modelenceMutation('todos.setCompleted'));
-  const { mutateAsync: createTodo } = useMutation(modelenceMutation('todos.create'));
-  const { mutateAsync: updateTodo } = useMutation(modelenceMutation('todos.update'));
-  const { mutateAsync: deleteTodo } = useMutation(modelenceMutation('todos.delete'));
+  const { data: todos, refetch: refetchTodos, isFetching, error } = useQuery(todosModule.query('getAll'));
+  const { mutateAsync: setCompleted } = useMutation(todosModule.mutation('setCompleted'));
+  const { mutateAsync: createTodo } = useMutation(todosModule.mutation('create'));
+  const { mutateAsync: updateTodo } = useMutation(todosModule.mutation('update'));
+  const { mutateAsync: deleteTodo } = useMutation(todosModule.mutation('delete'));
+
+  todosModule.getConfig('dbUrl'); // Example of accessing module config
 
   if (error) return <div>Error: {error.message}</div>;
 
