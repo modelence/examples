@@ -61,8 +61,8 @@ export default new Module('aiChat', {
       const contextMessages = messages.slice(-10);
 
       const response = await generateText({
-        provider: 'anthropic',
-        model: 'claude-sonnet-4-6',
+        provider: 'openai',
+        model: 'gpt-4o',
         messages: contextMessages,
       });
 

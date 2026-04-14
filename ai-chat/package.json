@@ -10,11 +10,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@modelence/ai": "^0.1.6-dev.1",
-    "@modelence/auth-ui": "^0.1.18-dev.0",
-    "@modelence/react-query": "^1.2.6-dev.1",
+    "@modelence/ai": "^0.1.3",
+    "@modelence/auth-ui": "^0.1.16",
+    "@modelence/react-query": "^1.0.2",
     "@tanstack/react-query": "^5.80.5",
-    "modelence": "^0.12.0",
+    "modelence": "^0.10.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
