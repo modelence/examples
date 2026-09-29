@@ -6,7 +6,7 @@ import { z } from 'zod';
 export default new Module('aiChat', {
   stores: [dbChats, dbMessages],
   queries: {
-    async getChats(args, { user: _user }) {
+    async getChats(_args, { user: _user }) {
       const user = requireUser(_user);
       return dbChats.fetch({ userId: new ObjectId(user.id) }, {
         sort: { createdAt: -1 },

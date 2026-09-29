@@ -14,7 +14,7 @@ interface RunCommandResponse {
 }
 
 export async function runCommand(params: RouteParams): Promise<RouteResponse<RunCommandResponse | ErrorResponse>> {
-  return withErrorHandling(async () => {
+  return withErrorHandling<RunCommandResponse>(async () => {
     const { dataSource, database, command } = params.body as RunCommandRequest;
 
     // Validate required fields

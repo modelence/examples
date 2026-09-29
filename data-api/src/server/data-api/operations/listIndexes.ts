@@ -1,3 +1,4 @@
+import type { IndexDescriptionInfo } from 'mongodb';
 import { RouteParams, RouteResponse } from 'modelence/server';
 import { getDatabase } from '../mongoClient';
 import { ErrorResponse, validateRequiredMongoFields, withErrorHandling } from '../utils';
@@ -8,17 +9,8 @@ interface ListIndexesRequest {
   collection: string;
 }
 
-interface IndexInfo {
-  v: number;
-  key: Record<string, any>;
-  name: string;
-  unique?: boolean;
-  sparse?: boolean;
-  expireAfterSeconds?: number;
-}
-
 interface ListIndexesResponse {
-  indexes: IndexInfo[];
+  indexes: IndexDescriptionInfo[];
 }
 
 export async function listIndexes(params: RouteParams): Promise<RouteResponse<ListIndexesResponse | ErrorResponse>> {
